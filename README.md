@@ -1,148 +1,124 @@
-# contest2026_482_xingguangyinli
+# 画间 Living Canvas
 
-👋 欢迎参加 **2026 首届 openvela AI 硬件开发者大赛**！
+**一幅会生活、也会在需要时帮你做决定的交互画。**
 
-这是组委会为你的队伍创建的**专属参赛仓库**（本仓为样例/模板，队伍编号 `482`；你看到的将是你自己的 `contest2026_<编号>_<队伍名>`）。比赛期间，你的全部参赛代码、打包产物与 AI Coding 日志都提交到这里。
+画间 Living Canvas 由星光引力 Starlight Gravity 发起。项目把实体绘画、局部动态屏幕、原创角色与设备端 AI Agent 组合成家居艺术装置。第一条端到端体验聚焦晚餐：收集预算和明确限制，给出不超过三个可执行候选，等待用户确认，再把确认结果用于画面、灯光和可删除的偏好记忆。
 
-> 本仓既是「代码仓」，又内置了一键拉取整套 openvela 工程的 `repo` 清单（manifest）。你只需跟它打交道，**自始至终只动一个文件夹**。
+当前开发节点为 2026 首届 openvela AI 硬件开发者大赛。主控目标是 Gemini-S1（Allwinner R528S3），软件路线为 openvela、LVGL 与 ai_agent。
 
----
-
-## 一、先读这些官方文档
-
-**通用（所有赛道必读）：**
-
-| 文档                                                                                                                                     | 用途                                           |
-| ---------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
-| [《大赛总览》](https://github.com/open-vela/docs/blob/dev-ai-contest-2026/zh-cn/contest_2026/contest_overview.md)                        | 赛道、流程、评分、资源，建议先通读             |
-| [《参赛代码提交指南》](https://github.com/open-vela/docs/blob/dev-ai-contest-2026/zh-cn/contest_2026/code_submission_guide.md)           | 仓库获取、提交流程、时间与权限（**以此为准**） |
-| [《AI Coding 日志归集与提交手册》](https://github.com/open-vela/docs/blob/dev-ai-contest-2026/zh-cn/contest_2026/ai_coding_log_guide.md) | 如何导出 AI 对话日志并提交到 `logs/`           |
-
-**按你的赛道选读（三选一）：**
-
-| 赛道                  | 教程导航                                                                                                                                                 |
-| --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 快应用 / 手表应用创新 | [快应用教程导航](https://github.com/open-vela/docs/blob/dev-ai-contest-2026/zh-cn/contest_2026/quickapp/quickapp_guide_index.md)                         |
-| AI 硬件产品创新       | [AI 硬件赛道教程导航](https://github.com/open-vela/docs/blob/dev-ai-contest-2026/zh-cn/contest_2026/ai_hardware/ai_hardware_guide_index.md)              |
-| 新硬件适配            | [新硬件适配赛道教程导航](https://github.com/open-vela/docs/blob/dev-ai-contest-2026/zh-cn/contest_2026/hardware_porting/hardware_porting_guide_index.md) |
-
----
-
-## 二、第一步：拉取完整工程
-
-用组委会提供的命令一键拉取「openvela 全量源码 + 你的专属仓」：
-
-```bash
-repo init -u https://github.com/open-vela/contest2026_482_xingguangyinli \
-  -b dev-ai-contest-2026 -m contest2026_482_xingguangyinli.xml
-repo sync -c -j8
-```
-
-同步后，你的整个仓库位于工作区的 `contest2026_482_xingguangyinli/`，openvela 全量源码在外层（`nuttx/`、`apps/`、`packages/`、`vendor/` 等）。
-
----
-
-## 三、第二步：在哪里写代码
-
-**只在自己的仓目录 `contest2026_482_xingguangyinli/` 里开发。** 不同作品形态放在对应子目录，manifest 会通过 `<linkfile>` 把它们**软链**到 openvela 编译树该在的位置——你不用手动 copy：
-
-| 作品形态 | 你的代码放这里             | 系统自动映射到                                 |
-| -------- | -------------------------- | ---------------------------------------------- |
-| 应用     | `app/hello_app/`           | `packages/demos/contest2026_482_hello_app`     |
-| 快应用   | `quickapp/hello_quickapp/` | `packages/apps/contest2026_482_hello_quickapp` |
-| 板级适配 | `board/contest_board/`     | `vendor/openvela/boards/contest2026_482_board` |
-
-> 用不到的形态目录可以删掉；新增作品时按同样规则加子目录，并在 `contest2026_482_xingguangyinli.xml` 里补一条 `<linkfile>` 映射即可。**生产仓库（packages/nuttx/vendor 等）零改动。**
-
-建议仓库目录约定（便于评委定位）：
-
-```text
-app/ | quickapp/ | board/   # 你的作品代码
-logs/                       # AI Coding 日志（主动导出后提交，格式见 logs/README.md）
-README.md                   # 作品说明（提交前请改成你自己的，见第六节）
-```
-
-> 仓内附带了一个 `.gitignore.example`，给出了**编译产物**等不需要进仓的文件示例。如需启用，`cp .gitignore.example .gitignore` 后按需增删即可。**注意 `logs/` 下最终导出的 AI Coding 日志必须提交，不要忽略。**
->
-> `logs/` 的目录结构与提交格式见 [logs/README.md](logs/README.md)。
-
----
-
-## 四、第三步：编译与运行
-
-编译/运行步骤随作品形态不同而不同，请参考你所在赛道的教程导航：
-
-- 快应用 / 手表应用：[快应用教程导航](https://github.com/open-vela/docs/blob/dev-ai-contest-2026/zh-cn/contest_2026/quickapp/quickapp_guide_index.md)（含模拟器与开发板部署）。
-- AI 硬件产品创新：[AI 硬件赛道教程导航](https://github.com/open-vela/docs/blob/dev-ai-contest-2026/zh-cn/contest_2026/ai_hardware/ai_hardware_guide_index.md)（环境搭建、编译烧录、Skill 开发）。
-- 新硬件适配：[新硬件适配赛道教程导航](https://github.com/open-vela/docs/blob/dev-ai-contest-2026/zh-cn/contest_2026/hardware_porting/hardware_porting_guide_index.md)（BSP 移植、最小 NSH 基线）。
-
-子目录已通过 manifest 中的 `<linkfile>` 软链进 openvela 编译树，因此构建在 openvela 工作区**根目录**（即你这个仓的上一级）进行。openvela 使用 `build.sh` 作为统一入口，接收一个 **board config 路径**作为参数：
-
-```bash
-# 进入 openvela 工作区根目录（你的仓的上一级）
-cd ..
-
-# 通用语法：第一个参数是 board config 路径，第二个参数可以是 menuconfig / distclean 等
-./build.sh <board-config-path> [menuconfig|distclean] [-j8]
-```
-
-> 具体的 board config 路径、目标产物、模拟器/真机部署方式请以你所在赛道的教程导航为准。本仓 `app/` `quickapp/` `board/` 三个示例骨架对应的 Kconfig 选项可通过 `menuconfig` 启用。
-
----
-
-## 五、第四步：提交作品
-
-1. **fork** 你的专属仓 → 开发 → `git commit` 并推送 → 向专属仓发起 **Pull Request**，可**自行 review 并合入**（无需等组委会）。
-2. **AI Coding 日志**：与 AI 工具的对话会自动记录到本机 staging（不会自动上传），需你**主动导出/打包**选定会话到仓内 `logs/` 目录后一并提交。详见[《AI Coding 日志归集与提交手册》](https://github.com/open-vela/docs/blob/dev-ai-contest-2026/zh-cn/contest_2026/ai_coding_log_guide.md)。
-3. 若需改动 **nuttx 等公共仓库**，不在本仓改，而是 fork 对应公共仓、以 PR 提交到 `dev-ai-contest-2026` 分支，由组委会 review 后合入。
-
-> ⏰ **提交作品截止：9 月 20 日**。截止后统一收回 push 权限，仍可查看 / clone。
->
-> 获奖后再按要求将作品 PR 至 openvela 上游对应仓库（走标准 PR + CI 流程）。
-
-### 关于 PR 与 CLA
-
-- 本仓所有改动通过 **Pull Request** 合入（分支保护强制，可自行合入自己的 PR）。
-- 首次贡献需在[**官网签署 CLA**](https://openvela.com/#/community/cla)；PR 上会自动跑 `cla/signature` 检查，在官网签署成功后，在 PR 评论 `/check-cla` 复检即可通过。
-
----
-
-## 六、提交前：把本 README 改成你的作品说明
-
-本文件目前是组委会给的**使用说明书**。**作品提交前，请把它替换成你自己作品的说明**，方便评委快速了解你做了什么、怎么跑起来。建议至少包含以下内容：
-
-```markdown
-# <你的作品名>
+> 状态更新：2026-09-14。纯 C 状态机、指针钟数学、晚餐约束、确认记忆和 UI 视图模型已通过 macOS 主机测试及 AddressSanitizer/UBSan。完整 openvela 工作区、LVGL 真机界面、语音、外设联动、板级构建与刷机尚未完成；本文不会把这些规划写成已实现结果。
 
 ## 一、作品简介
-<一句话/一段话说明这个作品是什么、解决什么问题、亮点在哪>
+
+画中的猫和朋友平时安静生活；用户需要时，可以通过触摸或语音开始晚餐协商。系统将当天意愿与长期偏好分开处理：临时的“不吃辣”不会自动变成永久记忆，只有用户确认后，明确选择保存的稳定偏好才会写入本地存储。
+
+核心安全边界：
+
+- 模型只返回受限结构化结果，不能直接开灯、写记忆、下单、运行设备命令或处理付款。
+- 过敏、预算、是否做饭和临时口味在本地再次校验。
+- 推荐最多三个候选；信息不足时追问，不编造价格、库存、配料或配送时间。
+- 未同步时间显示 `--:--`，不伪造时刻。
+- 网络错误、取消和重复存在事件都有确定的退出/冷却路径。
+- 凭据不进入源码、文档、测试证据或 AI Coding 日志。
 
 ## 二、选题方向
-<快应用 / 手表应用创新 ｜ AI 硬件产品创新 ｜ 新硬件适配 ｜ 自定方向，并简述理由>
+
+**AI 硬件产品创新。**
+
+项目重点不是把聊天界面搬到屏幕，而是让 AI 的结果经过本地约束与用户确认后，安全地驱动画面、声音和低压实体交互。Gemini-S1 始终作为主控；毫米波、触摸和摄像头等外设逐项验证，未验证的能力不会进入演示承诺。
 
 ## 三、目录结构
-<列出你这个仓里各目录/文件的作用，例如：>
-- `app/xxx/`        — <说明>
-- `board/xxx/`      — <说明>
-- `quickapp/xxx/`   — <说明>
-- `logs/`           — AI Coding 日志
-- `docs/` 或其他    — <说明>
 
-## 四、运行方式
-<拉取工程后，如何编译、烧录/部署、运行的完整步骤；最好能让评委照着一步步复现>
-
-## 五、AI Coding 使用说明
-<说明本作品如何借助 AI 辅助开发：
-- 在需求拆解 / 方案设计 / 编码 / 调试 / 文档等环节如何与 AI 协作；
-- AI 对开发效率或质量带来的实际帮助。
-完整对话日志见 logs/ 目录>
+```text
+app/hello_app/
+  include/                 固定边界的核心接口
+  src/                     纯 C 状态、时钟、晚餐、记忆和 UI 模型
+  skills/dinner_assistant/ 晚餐运行时合同
+  tests/host/              可在 Mac/Linux 重复运行的主机测试
+docs/                      环境、设备基线、恢复与构建门禁
+scripts/device/            只读 USB/ADB 身份与证据脚本
+tests/evidence/            脱敏的真实环境和设备证据
+logs/                      经人工审查后提交的赛事 AI Coding 日志
 ```
 
-> 提示：将会根据「作品本身 + 你的 README 说明 + `logs/` 里的 AI Coding 日志」来理解和评估你的作品，README 写清楚很重要。
+赛事 manifest 将 `app/hello_app/` 映射到：
 
----
+```text
+packages/demos/contest2026_482_hello_app/
+```
 
-## 附：仓库命名规范
+## 四、运行方式
 
-`contest2026_<编号>_<队伍名>` — 编号三位零填充；队名 slug（全小写、英文/拼音、连字符）。例：`contest2026_482_xingguangyinli`。
-（仓库由组委会统一创建，**每队仅一个仓**，无需自行命名。）
+### 1. 当前可重复的主机测试
+
+在本仓根目录执行：
+
+```bash
+make -C app/hello_app/tests/host clean test
+bash app/hello_app/tests/host/test_build_metadata.sh
+bash app/hello_app/tests/host/test_lc_ui_build.sh
+```
+
+测试覆盖：
+
+- `IDLE → GREETING → LISTENING → THINKING → RECOMMENDATION → CONFIRMED`；
+- 取消、网络错误恢复、确认写入保护和存在事件冷却；
+- 00:00、03:00、06:30、12:00、23:59 的时针/分针角度；
+- 未同步时间不显示伪造时刻；
+- 忌口、预算、临时不辣和“不想做饭”的过滤；
+- 未知或高权限模型动作被拒绝；
+- 只有确认后的稳定偏好写入，支持清除和版本化文件往返；
+- UI 状态、猫咪睁闭眼和二维码可见性。
+
+### 2. 设备身份检查
+
+macOS 上只读执行：
+
+```bash
+bash scripts/device/verify_usb_inventory.sh
+```
+
+Gemini-S1 必须唯一匹配序列号 `1234` 与 USB 身份 `18d1:4e11 / NuttX / Debug Bridge`。外设断开时会明确显示 `MISSING`；`--require-all` 仅用于完整硬件盘点。
+
+### 3. openvela 构建与真机
+
+尚未宣称完成。准确的环境状态、官方配置路径和构建证据要求见：
+
+- `docs/ENVIRONMENT_SETUP.md`
+- `docs/BUILD_AND_FLASH.md`
+- `docs/DEVICE_BASELINE.md`
+- `docs/RECOVERY.md`
+
+当前状态为 `BLOCKED_FOR_DISK_AND_DEPENDENCIES` 与 `BLOCKED_FOR_FLASH`。在取得厂商/官方恢复包、确认硬件版本和回滚流程之前，不执行首次刷机。
+
+## 五、AI Coding 使用说明
+
+AI 协作目前用于需求拆解、风险边界、官方资料核对、测试先行实现、失败证据保留、隐私扫描和文档整理。每个核心模块先观察预期失败，再写最小实现，并同时运行严格编译警告与 sanitizer。
+
+赛事日志采集器尚未安装。官方采集字段可能包含对话、思考、工具输入与输出，因此必须在完整 `.repo/` 工作区建立后审阅安装脚本，并使用一个新的项目专用会话验证。任何含密码、API Key、私人路径、个人文件或无关对话的会话都不得提交。详情见 `docs/LOGGING_SETUP.md`。
+
+## 六、当前验证状态
+
+| 能力 | 状态 | 证据 |
+| --- | --- | --- |
+| Gemini-S1 USB/ADB 身份 | 已验证（只读） | `tests/evidence/device/` |
+| Ubuntu 22.04 ARM64、4 核、8 GB | 已验证 | `tests/evidence/build/` |
+| 核心纯 C 逻辑 | 主机测试通过 | `app/hello_app/tests/host/` |
+| openvela 全量同步与 ARM64 预编译工具 | 未完成 | `docs/ENVIRONMENT_SETUP.md` |
+| LVGL 真机画面、录放音、ai_agent | 未完成 | 后续真实证据 |
+| 毫米波、MPR121、灯光、摄像头 | 未接入 | 外设保持断开 |
+| 固件构建与首次刷机 | 阻塞 | `docs/BUILD_AND_FLASH.md`、`docs/RECOVERY.md` |
+
+## 七、隐私与许可证
+
+- 不提交 Wi-Fi 密码、模型 Token、Ubuntu 密码、SSH 私钥、家庭原始影像或付款信息。
+- 用户记忆须可查看、纠正和删除；临时意愿与长期偏好分开保存。
+- 宠物快报只有在真实图像和时间证据存在时才描述事件。
+- 第三方字体、图片、音频和代码在进入最终演示前逐项记录来源与授权。
+
+## 参考
+
+- [openvela 官方文档](https://github.com/open-vela/docs)
+- [AI 硬件赛道教程](https://github.com/open-vela/docs/blob/dev-ai-contest-2026/zh-cn/contest_2026/ai_hardware/ai_hardware_guide_index.md)
+- [Gemini-S1 板级说明](https://github.com/open-vela/vendor_allwinnertech/blob/dev-ai-contest-2026/boards/r528/r528s3-gemini-s1/README_zh-cn.md)
+- [本队官方赛事仓](https://github.com/open-vela/contest2026_482_xingguangyinli)
