@@ -44,6 +44,20 @@ static void test_transient_no_spicy_is_not_permanent_memory(void)
   assert(memory.allergen_flags == LC_ALLERGEN_NONE);
 }
 
+static void test_unknown_allergen_bits_do_not_report_a_change(void)
+{
+  lc_memory_t memory;
+  lc_memory_update_t update = {
+    .confirmed = true,
+    .remember_allergens = true,
+    .allergen_flags = 1u << 31,
+  };
+
+  lc_memory_init(&memory);
+  assert(!lc_memory_apply_confirmation(&memory, &update));
+  assert(memory.allergen_flags == LC_ALLERGEN_NONE);
+}
+
 static void test_clear_one_and_clear_all(void)
 {
   lc_memory_t memory = {
@@ -93,6 +107,7 @@ int main(void)
 {
   test_only_confirmed_permanent_preferences_are_saved();
   test_transient_no_spicy_is_not_permanent_memory();
+  test_unknown_allergen_bits_do_not_report_a_change();
   test_clear_one_and_clear_all();
   test_atomic_file_round_trip_and_version_check();
   puts("PASS: lc_memory");

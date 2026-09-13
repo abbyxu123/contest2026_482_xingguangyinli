@@ -38,12 +38,16 @@ bool lc_memory_apply_confirmation(lc_memory_t *memory,
       changed = true;
     }
 
-  if (update->remember_allergens &&
-      memory->allergen_flags != update->allergen_flags)
+  if (update->remember_allergens)
     {
-      memory->allergen_flags = update->allergen_flags &
-                               LC_MEMORY_ALLERGEN_MASK;
-      changed = true;
+      unsigned int allergen_flags = update->allergen_flags &
+                                    LC_MEMORY_ALLERGEN_MASK;
+
+      if (memory->allergen_flags != allergen_flags)
+        {
+          memory->allergen_flags = allergen_flags;
+          changed = true;
+        }
     }
 
   return changed;
