@@ -11,6 +11,23 @@
 
 typedef struct
 {
+  unsigned int x;
+  unsigned int y;
+  unsigned int width;
+  unsigned int height;
+} lc_ui_rect_t;
+
+typedef struct
+{
+  lc_ui_rect_t clock;
+  lc_ui_rect_t weather;
+  lc_ui_rect_t cat;
+  lc_ui_rect_t dialog;
+  lc_ui_rect_t qr;
+} lc_ui_layout_t;
+
+typedef struct
+{
   bool cat_eyes_open;
   bool qr_visible;
   bool clock_visible;
@@ -31,5 +48,8 @@ lc_ui_status_t lc_ui_build_model(lc_state_t state,
                                  unsigned int hour,
                                  unsigned int minute,
                                  lc_ui_model_t *model);
+bool lc_ui_compute_layout(unsigned int width,
+                          unsigned int height,
+                          lc_ui_layout_t *layout);
 
 #endif
