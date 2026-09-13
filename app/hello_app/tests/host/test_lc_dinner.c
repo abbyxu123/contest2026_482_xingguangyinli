@@ -104,6 +104,10 @@ static void test_result_rejects_unknown_or_privileged_actions(void)
   assert(!lc_dinner_validate_result(&result));
   result.actions = (lc_actions_t)(1u << 31);
   assert(!lc_dinner_validate_result(&result));
+  result.candidate_count = 0u;
+  result.next_state = LC_STATE_LISTENING;
+  result.actions = LC_ACTION_SHOW_STATE | LC_ACTION_SHOW_QR;
+  assert(!lc_dinner_validate_result(&result));
 }
 
 int main(void)
