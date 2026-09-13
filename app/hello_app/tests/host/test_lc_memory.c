@@ -100,6 +100,13 @@ static void test_atomic_file_round_trip_and_version_check(void)
   fputs("LCM99\nbudget_known=0\nbudget=0\nallergens=0\n", file);
   assert(fclose(file) == 0);
   assert(lc_memory_load(path, &loaded) == LC_MEMORY_UNSUPPORTED_VERSION);
+
+  file = fopen(path, "w");
+  assert(file != NULL);
+  fputs("LCM1\nbudget_known=0\nbudget=0\nallergens=0\nunexpected\n",
+        file);
+  assert(fclose(file) == 0);
+  assert(lc_memory_load(path, &loaded) == LC_MEMORY_MALFORMED);
   unlink(path);
 }
 
