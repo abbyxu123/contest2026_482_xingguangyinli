@@ -47,11 +47,19 @@ lc_actions_t lc_state_handle(lc_state_machine_t *machine,
       case LC_STATE_IDLE:
         if (event == LC_EVENT_PRESENCE)
           {
-            if (machine->has_greeted &&
-                now_ms - machine->last_greeting_ms <
-                  machine->presence_cooldown_ms)
+            if (machine->has_greeted)
               {
-                return LC_ACTION_NONE;
+                if (now_ms < machine->last_greeting_ms)
+                  {
+                    machine->last_greeting_ms = now_ms;
+                    return LC_ACTION_NONE;
+                  }
+
+                if (now_ms - machine->last_greeting_ms <
+                    machine->presence_cooldown_ms)
+                  {
+                    return LC_ACTION_NONE;
+                  }
               }
 
             machine->state = LC_STATE_GREETING;

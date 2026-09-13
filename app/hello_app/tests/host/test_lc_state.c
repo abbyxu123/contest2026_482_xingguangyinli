@@ -90,6 +90,23 @@ static void test_presence_cooldown_suppresses_repeat_greeting(void)
   assert(machine.state == LC_STATE_GREETING);
 }
 
+static void test_presence_cooldown_survives_clock_rollback(void)
+{
+  lc_state_machine_t machine;
+
+  lc_state_init(&machine, 30000u);
+  lc_state_handle(&machine, LC_EVENT_PRESENCE, 50000u);
+  lc_state_handle(&machine, LC_EVENT_CANCEL, 51000u);
+
+  assert(lc_state_handle(&machine, LC_EVENT_PRESENCE, 1000u) ==
+         LC_ACTION_NONE);
+  assert(machine.state == LC_STATE_IDLE);
+
+  expect_action(lc_state_handle(&machine, LC_EVENT_PRESENCE, 31000u),
+                LC_ACTION_SHOW_STATE);
+  assert(machine.state == LC_STATE_GREETING);
+}
+
 static void test_unrelated_event_does_nothing(void)
 {
   lc_state_machine_t machine;
@@ -106,6 +123,7 @@ int main(void)
   test_confirmed_write_is_not_cancelled();
   test_network_error_and_recovery();
   test_presence_cooldown_suppresses_repeat_greeting();
+  test_presence_cooldown_survives_clock_rollback();
   test_unrelated_event_does_nothing();
   puts("PASS: lc_state");
   return 0;
