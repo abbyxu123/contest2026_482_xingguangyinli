@@ -16,6 +16,13 @@ Do not flash, erase, repartition, boot an alternate image, enter an undocumented
 - The official board README describes compilation and points to generic packaging/deployment documentation.
 - USB currently enumerates as NuttX Debug Bridge `18d1:4e11`, serial `1234`.
 
+## Public recovery-source audit
+
+- The pinned BSP `build/` directory exposes a build config, `pre_build.sh`, and `generate_ota_package.sh`; it does not expose a host flashing utility or board recovery procedure.
+- The OTA generator blob `c1688e424daf6fbdcbaa0fb2aae081f0d12dac0d` invokes the shared `lichee/pack.sh`, refers to `r528s3/evb4_nand`, and can download an externally supplied `ota_base_url`. It generates full/OTA artifacts but does not establish how to restore this physical Gemini-S1 safely.
+- The public tree also contains `lichee/board/r528s3/gemini-s1_nand/configs/` with NAND and `_nor` variants. Repository filenames are not proof of the storage fitted to serial `1234`.
+- The vendor README delegates complete packing and deployment instructions to board/vendor documentation. The linked vendor wiki was not readable in this environment, so its contents are not treated as verified.
+
 ## Missing recovery prerequisites
 
 - Factory image or board-matched recovery package: **not acquired**.
