@@ -71,6 +71,59 @@ static void test_invalid_input_is_rejected(void)
          LC_UI_INVALID);
 }
 
+static bool rect_within(lc_ui_rect_t rect,
+                        unsigned int width,
+                        unsigned int height)
+{
+  return rect.width > 0u && rect.height > 0u && rect.x < width &&
+         rect.y < height && rect.width <= width - rect.x &&
+         rect.height <= height - rect.y;
+}
+
+static void test_relative_layout_stays_within_screen(void)
+{
+  const unsigned int dimensions[][2] = {
+    {320u, 240u},
+    {240u, 320u},
+    {1280u, 720u},
+  };
+  size_t index;
+
+  for (index = 0u; index < sizeof(dimensions) / sizeof(dimensions[0]);
+       index++)
+    {
+      unsigned int width = dimensions[index][0];
+      unsigned int height = dimensions[index][1];
+      lc_ui_layout_t layout;
+
+      assert(lc_ui_compute_layout(width, height, &layout));
+      assert(rect_within(layout.clock, width, height));
+      assert(rect_within(layout.weather, width, height));
+      assert(rect_within(layout.cat, width, height));
+      assert(rect_within(layout.dialog, width, height));
+      assert(rect_within(layout.qr, width, height));
+      assert(layout.clock.y == layout.weather.y);
+      assert(layout.cat.y >= layout.clock.y + layout.clock.height);
+      assert(layout.dialog.y >= layout.cat.y + layout.cat.height);
+      assert(layout.qr.x >= layout.dialog.x);
+      assert(layout.qr.y >= layout.dialog.y);
+      assert(layout.qr.x + layout.qr.width <=
+             layout.dialog.x + layout.dialog.width);
+      assert(layout.qr.y + layout.qr.height <=
+             layout.dialog.y + layout.dialog.height);
+    }
+}
+
+static void test_layout_rejects_unusable_dimensions(void)
+{
+  lc_ui_layout_t layout;
+
+  assert(!lc_ui_compute_layout(0u, 240u, &layout));
+  assert(!lc_ui_compute_layout(320u, 0u, &layout));
+  assert(!lc_ui_compute_layout(63u, 63u, &layout));
+  assert(!lc_ui_compute_layout(320u, 240u, NULL));
+}
+
 int main(void)
 {
   test_idle_scene_is_quiet();
@@ -78,6 +131,8 @@ int main(void)
   test_qr_is_visible_only_for_recommendation();
   test_unsynced_time_uses_explicit_placeholder();
   test_invalid_input_is_rejected();
+  test_relative_layout_stays_within_screen();
+  test_layout_rejects_unusable_dimensions();
   puts("PASS: lc_ui");
   return 0;
 }
