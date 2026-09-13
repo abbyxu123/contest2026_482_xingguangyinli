@@ -1,5 +1,6 @@
 #include "lc_memory.h"
 
+#include <ctype.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -124,6 +125,8 @@ lc_memory_status_t lc_memory_load(const char *path, lc_memory_t *memory)
   unsigned int budget;
   unsigned int allergens;
   int parsed;
+  int character;
+  bool trailing_data = false;
 
   if (path == NULL || memory == NULL)
     {
@@ -147,12 +150,27 @@ lc_memory_status_t lc_memory_load(const char *path, lc_memory_t *memory)
   parsed = fscanf(file,
                   "LCM%u\nbudget_known=%u\nbudget=%u\nallergens=%u\n",
                   &version, &budget_known, &budget, &allergens);
+  while ((character = fgetc(file)) != EOF)
+    {
+      if (!isspace((unsigned char)character))
+        {
+          trailing_data = true;
+          break;
+        }
+    }
+
+  if (ferror(file) != 0)
+    {
+      fclose(file);
+      return LC_MEMORY_IO_ERROR;
+    }
+
   if (fclose(file) != 0)
     {
       return LC_MEMORY_IO_ERROR;
     }
 
-  if (parsed != 4)
+  if (parsed != 4 || trailing_data)
     {
       return LC_MEMORY_MALFORMED;
     }
