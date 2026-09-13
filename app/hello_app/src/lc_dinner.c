@@ -24,6 +24,12 @@ bool lc_dinner_validate_result(const lc_dinner_result_t *result)
       return false;
     }
 
+  if (result->candidate_count == 0u &&
+      (result->actions & LC_ACTION_SHOW_QR) != 0u)
+    {
+      return false;
+    }
+
   if (result->candidate_count > 0u &&
       result->next_state != LC_STATE_RECOMMENDATION)
     {
