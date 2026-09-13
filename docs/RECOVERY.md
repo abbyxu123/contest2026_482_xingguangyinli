@@ -34,6 +34,8 @@ Do not flash, erase, repartition, boot an alternate image, enter an undocumented
 - Stable serial-console access and boot log capture: **not established**.
 - Official confirmation that an image built from the contest branch is compatible with this shipped unit: **not recorded**.
 
+Use `docs/VENDOR_RECOVERY_QUESTIONS.md` as the minimum support request; do not replace missing technical answers with assumptions.
+
 ## Flash authorization gate
 
 First flash is allowed only after all of the following are true:
