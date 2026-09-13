@@ -26,6 +26,8 @@ The project directory was renamed to ASCII-only `xiaomi-openvela-ibbie` to reduc
 - RAM: 8 GB configured; guest reports 7.7 GiB
 - Swap: 3.8 GiB
 - Root filesystem: 55 GiB total, 46 GiB available at last check
+- Virtual disk: 64 GiB (`vda`); LVM partition about 60.9 GiB and root logical volume 56 GiB
+- Estimated unused LVM capacity: about 4.9 GiB; exact extent data requires user-present sudo access
 - Network: UTM shared network; guest address was `192.168.64.2` at last check and may change after restart
 - Access: SSH public-key authentication for the development session; passwordless sudo is not configured
 
@@ -51,6 +53,8 @@ Evidence: `tests/evidence/build/ubuntu-host-baseline-20260913T185829Z.txt`.
 ## Official requirements and local constraints
 
 The pinned official Ubuntu guide supports Ubuntu 22.04 on arm64 or x86_64 and requests at least 40 GB free disk and 16 GB RAM. The host Mac itself has only 16 GB, so assigning 16 GB to the guest is not safe. The chosen guest allocation is 8 GB plus swap, and build/sync concurrency will be limited to `-j2`.
+
+A read-only `lsblk` check confirmed that the current 64 GiB virtual disk is already fully partitioned. Extending the existing logical volume alone would add only about 4.9 GiB, which does not resolve the workspace headroom risk. Any UTM disk resize must therefore happen with the VM shut down and the user present, followed by separately verified partition, PV, LV, and filesystem growth; no unattended storage mutation is authorized.
 
 The current 46 GiB free root filesystem exceeds the stated 40 GB minimum by only about 6 GiB. That is not enough safety margin for source, LFS objects, build artifacts, retries, and logs. Full `repo sync` is blocked until the virtual storage plan is expanded and verified.
 
