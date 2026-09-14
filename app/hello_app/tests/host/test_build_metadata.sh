@@ -10,15 +10,20 @@ grep -q 'packages/demos/contest2026_482_hello_app' "$app_dir/Make.defs"
 grep -q "CONFIG_$symbol" "$app_dir/Makefile"
 grep -q "CONFIG_$symbol" "$app_dir/CMakeLists.txt"
 
-for source in lc_state.c lc_clock.c lc_dinner.c lc_memory.c lc_voice.c; do
+for source in lc_state.c lc_clock.c lc_dinner.c lc_memory.c lc_voice.c lc_agent.c lc_agent_bridge.c; do
   grep -q "src/$source" "$app_dir/Makefile"
   grep -q "src/$source" "$app_dir/CMakeLists.txt"
 done
 
 grep -q 'include' "$app_dir/Makefile"
 grep -q 'INCLUDE_DIRECTORIES' "$app_dir/CMakeLists.txt"
+grep -q 'packages/ai_agent/include' "$app_dir/Makefile"
+grep -q 'packages/ai_agent/include' "$app_dir/CMakeLists.txt"
 grep -q '#include "lc_voice.h"' "$app_dir/hello_app_main.c"
 grep -q 'lc_voice_init' "$app_dir/hello_app_main.c"
+grep -q '#include "lc_agent.h"' "$app_dir/hello_app_main.c"
+grep -q '#include "lc_agent_bridge.h"' "$app_dir/hello_app_main.c"
+grep -q -- '--agent-prompt' "$app_dir/hello_app_main.c"
 
 
 if grep -Eq 'CONTEST2026_000|team 000' \
