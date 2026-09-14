@@ -88,7 +88,25 @@ Verification proved that `hello_app_main.c`, `lc_clock.c`, `lc_dinner.c`, `lc_me
 
 The ignored local backup is under `local-setup/backups/gemini-s1-living-canvas-20260914/`. Complete commands, commits, output hashes, and the post-build repository-state qualification are recorded in `tests/evidence/build/gemini-s1-living-canvas-20260914.txt`.
 
+### Bounded-voice product rebuild
+
+The application was then extended with a bounded, in-memory voice-session state
+machine. It does not access the microphone, save audio, or use the network. A new
+host regression test compiles and executes `living_canvas_main`, in addition to
+the six module tests.
+
+The first product rebuild correctly failed on a malformed entry-point `printf`;
+the failure, cause, and regression response are retained in
+`tests/evidence/build/gemini-s1-voice-entry-red-20260914.txt`. After the fix, all
+seven strict host tests and the full Gemini-S1 product build passed. The resulting
+`nsh.fex` is `6,003,600` bytes with SHA-256
+`c17e48df9da1c0c068cc1cdb521be3156153a63ecaf884b4cf47588635009521`.
+
+The ignored backup is under
+`local-setup/backups/gemini-s1-living-canvas-voice-20260914/`; complete hashes and
 ## ARM64 compatibility record
+
+integration evidence are in `tests/evidence/build/gemini-s1-living-canvas-voice-20260914.txt`.
 
 Two failures were retained rather than overwritten:
 
