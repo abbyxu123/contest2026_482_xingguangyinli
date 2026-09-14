@@ -14,17 +14,18 @@ Officially documented record fields include conversation text, model thinking, t
 
 The global collector was deliberately not installed during unattended setup because:
 
-- the full `.repo/` workspace does not exist yet;
 - the installer changes global user configuration;
 - this setup conversation includes security-sensitive screenshots and should not be exported blindly;
 - GitHub identity and final log ownership must be confirmed by the participant;
 - every exported JSONL must be reviewed before commit.
 
+The complete `.repo/` workspace now exists. That resolves the workspace prerequisite but does not authorize a global hook installation or exporting this setup conversation.
+
 Status: `BLOCKED_FOR_USER_REVIEW`
 
 ## Safe installation sequence
 
-1. Complete the isolated openvela workspace and inspect the exact collector scripts from the pinned checkout.
+1. Use the completed isolated openvela workspace and inspect the exact collector scripts from the pinned checkout.
 2. Review all writes to `~/.claude/`, `~/.local/bin/`, shell startup files, and the team repository.
 3. Confirm team ID `contest2026_482_xingguangyinli` and the participant's exact GitHub login.
 4. Run the official installer from the pinned workspace.
