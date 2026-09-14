@@ -9,6 +9,7 @@ if(CONFIG_LVX_USE_DEMO_CONTEST2026_482_LIVING_CANVAS)
       src/lc_dinner.c
       src/lc_memory.c
       src/lc_ui.c
+      src/lc_voice.c
     INCLUDE_DIRECTORIES
       ${CMAKE_CURRENT_SOURCE_DIR}/include
     STACKSIZE 4096)
