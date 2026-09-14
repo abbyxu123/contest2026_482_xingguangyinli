@@ -10,7 +10,8 @@ Last verified: 2026-09-14 (Asia/Shanghai)
 - Allwinner board support revision: `1676386193f0e710121e710935f1757c0f34b662`
 - Pinned manifest: `/home/abby/openvela-workspace/pinned-manifest.xml`
 - `repo sync -c -j2`: completed successfully
-- `repo status` immediately after the verified build: clean
+- Before AI integration, `distclean` plus exact restoration of known tracked build side effects left the intended source repositories clean.
+- Full post-build `repo status` contains expected manifest linkfile/nested-project overlays and generated build files; it is not described as globally clean.
 
 ## Verified paths
 
@@ -20,7 +21,7 @@ Gemini-S1 target configuration:
 vendor/allwinnertech/boards/r528/r528s3-gemini-s1/configs/nsh_minidisplay/defconfig
 ```
 
-AI Agent defconfig source, reserved for the later AI-enabled build:
+AI Agent defconfig source used for the verified product build:
 
 ```text
 packages/ai_agent/defconfigs/gemini-s1/gemini-s1_defconfig
@@ -68,6 +69,24 @@ Verified outputs:
 | `vendor/allwinnertech/lichee/board/r528s3/gemini-s1_nand/configs/nsh.fex` | 7,340,976 | `73ad6568dc3c903f0492c339df7d1feca739087fadc442ffc27b6845bc7aca6f` |
 
 `nuttx` and `nuttx.elf` were identified as statically linked ARM EABI5 executables. `vela.bin` and the copied board `nsh.fex` have identical size and SHA-256. A local, ignored backup contains `nsh.fex`, the successful build log, and the pinned manifest under `local-setup/backups/gemini-s1-baseline-20260914/`.
+
+## AI Agent + Living Canvas product result
+
+Status: `PRODUCT_BUILD_PASSED / NOT_FLASHED`
+
+The official Gemini-S1 AI Agent configuration and compatibility patches were applied on local, reversible branches. The team application added only `CONFIG_LVX_USE_DEMO_CONTEST2026_482_LIVING_CANVAS=y` to that board configuration before rebuilding.
+
+Verified build command in Ubuntu:
+
+```bash
+QEMU_LD_PREFIX=/usr/x86_64-linux-gnu \
+QEMU_SET_ENV=LD_LIBRARY_PATH=/home/abby/.local/share/openvela-x86_64-jammy/root/lib/x86_64-linux-gnu \
+./build.sh vendor/allwinnertech/boards/r528/r528s3-gemini-s1/configs/nsh_minidisplay/ -e -Wno-error -j2
+```
+
+Verification proved that `hello_app_main.c`, `lc_clock.c`, `lc_dinner.c`, `lc_memory.c`, `lc_state.c`, and `lc_ui.c` compiled, and `nuttx.elf` contains the public symbol `living_canvas_main`. The board image is `6,003,600` bytes with SHA-256 `876a09162538bb84415cc588a3a0240ccb8b6af5fb24401b61a0c1d27d6cc778`.
+
+The ignored local backup is under `local-setup/backups/gemini-s1-living-canvas-20260914/`. Complete commands, commits, output hashes, and the post-build repository-state qualification are recorded in `tests/evidence/build/gemini-s1-living-canvas-20260914.txt`.
 
 ## ARM64 compatibility record
 

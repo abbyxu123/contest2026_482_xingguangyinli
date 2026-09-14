@@ -2,7 +2,7 @@
 
 Last verified: 2026-09-14 (Asia/Shanghai)
 
-This document records observed state. The official openvela workspace has been synchronized and the unmodified Gemini-S1 `nsh_minidisplay` baseline has built successfully. No image has been flashed.
+This document records observed state. The official openvela workspace has been synchronized; both the unmodified Gemini-S1 baseline and the AI Agent + Living Canvas product configuration have built successfully. No image has been flashed.
 
 ## Host Mac
 
@@ -54,7 +54,8 @@ The official `repo` launcher SHA-256 is `1211b57b57e4122a9c546295a59b37d24068f11
 - `repo sync -c -j2`: completed successfully
 - Pinned manifest: `/home/abby/openvela-workspace/pinned-manifest.xml`
 - Workspace size after sync and baseline build: about 38 GiB
-- `repo status` after the successful build: clean
+- Before AI integration, `distclean` plus exact restoration of known tracked build side effects left the intended source repositories clean.
+- A full post-build `repo status` is expected to contain manifest linkfile/nested-project overlays and generated dependency/object files, so it is not described as globally clean.
 
 The manifest maps this team's application, quick app, and board directories into the shared build tree. Product source remains authored in the team repository, not directly in shared upstream repositories.
 
@@ -75,6 +76,7 @@ The downloaded `zlib1g_1.2.11.dfsg-2ubuntu9.2_amd64.deb` was obtained from Ubunt
 
 - Full source sync: **ready**
 - Clean Gemini-S1 baseline build: **passed**
+- AI Agent + Living Canvas product build: **passed**
 - Application development and host tests: **ready**
 - Read-only USB/ADB identity checks: **passed**
 - First flash: **blocked pending recovery prerequisites**
