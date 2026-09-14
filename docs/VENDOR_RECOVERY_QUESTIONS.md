@@ -9,12 +9,15 @@
 - 板卡：Gemini-S1 / Allwinner R528S3
 - USB：`18d1:4e11`，Manufacturer `NuttX`，Product `Debug Bridge`
 - ADB 序列号：`1234`
+- 出厂属性：Manufacturer `Xiaomi`，Product `ASX4B`，版本 `1.51.32`，活动 OTA 槽 `A`
+- 只读检查确认 NAND 设备节点，`/data` 为 YAFFS，`/etc` 与 `/resource` 为 ROMFS
 - 当前出厂系统可启动；尚未执行刷写、擦除、分区、OTA 或恢复模式操作
 - 计划使用赛事分支 `dev-ai-contest-2026` 和 `nsh_minidisplay` 配置
+- AI Agent + Living Canvas 产品镜像已构建并记录 SHA-256，尚未写入设备
 
 ## 请官方逐项确认
 
-1. 这批比赛板的准确硬件版本、板号、启动介质和容量是什么？是 SPI NAND、SPI NOR、eMMC，还是其他组合？从板上丝印或只读命令如何核对？
+1. 这批比赛板的准确硬件版本、板号、NAND 型号和容量是什么？出厂属性 `ASX4B / 1.51.32` 与公开目标 `r528s3-gemini-s1` 的对应关系是什么？从板上丝印或只读命令如何进一步核对？
 2. 与该硬件版本完全匹配的出厂恢复镜像从哪里下载？请提供版本、发布日期、文件大小和官方 SHA-256。
 3. 官方支持的首次刷写工具是什么？请提供工具名称、准确版本、支持的主机系统、官方下载地址和校验值。
 4. 进入 FEL/烧录/恢复模式的准确按键、USB 端口、上电顺序和退出步骤是什么？失败或断电后如何恢复？
