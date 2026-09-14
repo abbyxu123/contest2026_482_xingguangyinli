@@ -82,7 +82,7 @@ Gemini-S1 必须唯一匹配序列号 `1234` 与 USB 身份 `18d1:4e11 / NuttX /
 
 ### 3. openvela 构建与真机
 
-官方未修改基线以及 AI Agent + Living Canvas 产品固件均已构建成功；真机刷写尚未执行。准确的环境状态、官方配置路径和构建证据见：
+官方未修改基线以及 AI Agent + Living Canvas 产品固件均已构建成功；最新固件已包含受限录音会话状态机和经过主入口编译执行测试的 `living_canvas_main`，真机刷写尚未执行。准确的环境状态、官方配置路径和构建证据见：
 
 - `docs/ENVIRONMENT_SETUP.md`
 - `docs/BUILD_AND_FLASH.md`
@@ -105,7 +105,7 @@ AI 协作目前用于需求拆解、风险边界、官方资料核对、测试�
 | Ubuntu 22.04 ARM64、4 核、8 GB | 已验证 | `tests/evidence/build/` |
 | 核心纯 C 逻辑 | 主机测试通过 | `app/hello_app/tests/host/` |
 | openvela 全量同步与 ARM64/兼容主机工具 | 已验证 | `docs/ENVIRONMENT_SETUP.md` |
-| AI Agent + Living Canvas 固件构建 | 已通过 | `tests/evidence/build/gemini-s1-living-canvas-20260914.txt` |
+| AI Agent + Living Canvas 固件构建 | 已通过（含受限录音入口） | `tests/evidence/build/gemini-s1-living-canvas-voice-20260914.txt` |
 | LVGL 真机画面、录放音、ai_agent 运行时 | 未上板验证 | 后续真实证据 |
 | 毫米波、MPR121、灯光、摄像头 | 未接入 | 外设保持断开 |
 | 未修改 Gemini-S1 基线构建 | 已通过 | `docs/BUILD_AND_FLASH.md` |
