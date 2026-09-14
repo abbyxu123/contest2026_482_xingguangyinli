@@ -23,5 +23,6 @@ int main(int argc, char *argv[])
     }
 
   printf("Living Canvas core ready (state=%d, voice_active=%d)\n",
+         (int)machine.state, lc_voice_is_active(&voice) ? 1 : 0);
   return 0;
 }
