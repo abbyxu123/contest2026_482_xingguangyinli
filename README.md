@@ -6,7 +6,7 @@
 
 当前开发节点为 2026 首届 openvela AI 硬件开发者大赛。主控目标是 Gemini-S1（Allwinner R528S3），软件路线为 openvela、LVGL 与 ai_agent。
 
-> 状态更新：2026-09-14。完整 openvela 工作区已同步；未修改基线与 AI Agent + Living Canvas 产品配置均已在 Ubuntu ARM64 上构建成功。构建日志确认六个 Living Canvas 源文件参与编译，ELF 含 `living_canvas_main`。纯 C 状态机、指针钟数学、晚餐约束、确认记忆和 UI 视图模型已通过 macOS 主机测试及 AddressSanitizer/UBSan。真机画面、语音运行时、外设联动与首次刷机仍需逐项验证；本文不会把这些规划写成已实现结果。
+> 状态更新：2026-09-15。完整 openvela 工作区已同步；未修改基线与 AI Agent + Living Canvas 产品配置均已在 Ubuntu ARM64 上构建成功。构建日志确认八个 Living Canvas 源文件参与编译，ELF 已链接 `living_canvas_main`、Agent 安全状态机与官方 VelaClaw 客户端桥接。九个严格主机测试通过，千问 `qwen3.8-max` 完成一次不含项目数据的最小连通验证。真机画面、Agent 板端运行时、音频播放、外设联动与首次刷机仍需逐项验证；本文不会把这些规划写成已实现结果。
 
 ## 一、作品简介
 
@@ -32,7 +32,7 @@
 ```text
 app/hello_app/
   include/                 固定边界的核心接口
-  src/                     纯 C 状态、时钟、晚餐、记忆和 UI 模型
+  src/                     纯 C 状态、时钟、晚餐、记忆、UI、语音与 Agent 安全桥接
   skills/dinner_assistant/ 晚餐运行时合同
   tests/host/              可在 Mac/Linux 重复运行的主机测试
 docs/                      环境、设备基线、恢复与构建门禁
@@ -69,6 +69,8 @@ bash app/hello_app/tests/host/test_lc_ui_build.sh
 - 未知或高权限模型动作被拒绝；
 - 只有确认后的稳定偏好写入，支持清除和版本化文件往返；
 - UI 状态、猫咪睁闭眼和二维码可见性。
+- Agent 输入、回复、超时和单请求并发边界；
+- 官方 VelaClaw 客户端桥接、错误回退与迟到回复拒绝。
 
 ### 2. 设备身份检查
 
@@ -82,7 +84,7 @@ Gemini-S1 必须唯一匹配序列号 `1234` 与 USB 身份 `18d1:4e11 / NuttX /
 
 ### 3. openvela 构建与真机
 
-官方未修改基线以及 AI Agent + Living Canvas 产品固件均已构建成功；最新固件已包含受限录音会话状态机和经过主入口编译执行测试的 `living_canvas_main`，真机刷写尚未执行。准确的环境状态、官方配置路径和构建证据见：
+官方未修改基线以及 AI Agent + Living Canvas 产品固件均已构建成功；最新固件已包含受限录音会话、Agent 安全状态机、官方 VelaClaw 桥接和 `--agent-prompt` 受限入口，真机刷写尚未执行。准确的环境状态、官方配置路径和构建证据见：
 
 - `docs/ENVIRONMENT_SETUP.md`
 - `docs/BUILD_AND_FLASH.md`
@@ -105,9 +107,10 @@ AI 协作目前用于需求拆解、风险边界、官方资料核对、测试�
 | Ubuntu 22.04 ARM64、4 核、8 GB | 已验证 | `tests/evidence/build/` |
 | 核心纯 C 逻辑 | 主机测试通过 | `app/hello_app/tests/host/` |
 | openvela 全量同步与 ARM64/兼容主机工具 | 已验证 | `docs/ENVIRONMENT_SETUP.md` |
-| AI Agent + Living Canvas 固件构建 | 已通过（含受限录音入口） | `tests/evidence/build/gemini-s1-living-canvas-voice-20260914.txt` |
+| AI Agent + Living Canvas 固件构建 | 已通过（含 Agent 安全桥接） | `tests/evidence/build/gemini-s1-living-canvas-agent-20260915.txt` |
+| 千问 qwen3.8-max 最小连通 | 已验证（Mac、非敏感固定探针） | `tests/evidence/integration/qwen3.8-max-connectivity-20260915.txt` |
 | Gemini-S1 板载麦克风采集通路 | 已验证（仅非内容信号） | `tests/evidence/device/gemini-microphone-signal-20260914.txt` |
-| LVGL 真机画面、音频播放、ai_agent 运行时 | 未上板验证 | 后续真实证据 |
+| LVGL 真机画面、音频播放、ai_agent 板端运行时 | 未上板验证 | 后续真实证据 |
 | 毫米波、MPR121、灯光、摄像头 | 未接入 | 外设保持断开 |
 | 未修改 Gemini-S1 基线构建 | 已通过 | `docs/BUILD_AND_FLASH.md` |
 | 首次刷机 | 阻塞 | `docs/BUILD_AND_FLASH.md`、`docs/RECOVERY.md` |
