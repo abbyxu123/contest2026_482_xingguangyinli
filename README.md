@@ -106,7 +106,8 @@ AI 协作目前用于需求拆解、风险边界、官方资料核对、测试�
 | 核心纯 C 逻辑 | 主机测试通过 | `app/hello_app/tests/host/` |
 | openvela 全量同步与 ARM64/兼容主机工具 | 已验证 | `docs/ENVIRONMENT_SETUP.md` |
 | AI Agent + Living Canvas 固件构建 | 已通过（含受限录音入口） | `tests/evidence/build/gemini-s1-living-canvas-voice-20260914.txt` |
-| LVGL 真机画面、录放音、ai_agent 运行时 | 未上板验证 | 后续真实证据 |
+| Gemini-S1 板载麦克风采集通路 | 已验证（仅非内容信号） | `tests/evidence/device/gemini-microphone-signal-20260914.txt` |
+| LVGL 真机画面、音频播放、ai_agent 运行时 | 未上板验证 | 后续真实证据 |
 | 毫米波、MPR121、灯光、摄像头 | 未接入 | 外设保持断开 |
 | 未修改 Gemini-S1 基线构建 | 已通过 | `docs/BUILD_AND_FLASH.md` |
 | 首次刷机 | 阻塞 | `docs/BUILD_AND_FLASH.md`、`docs/RECOVERY.md` |
