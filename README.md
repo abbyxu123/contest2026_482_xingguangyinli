@@ -6,7 +6,7 @@
 
 当前开发节点为 2026 首届 openvela AI 硬件开发者大赛。主控目标是 Gemini-S1（Allwinner R528S3），软件路线为 openvela、LVGL 与 ai_agent。
 
-> 状态更新：2026-09-14。纯 C 状态机、指针钟数学、晚餐约束、确认记忆和 UI 视图模型已通过 macOS 主机测试及 AddressSanitizer/UBSan。完整 openvela 工作区、LVGL 真机界面、语音、外设联动、板级构建与刷机尚未完成；本文不会把这些规划写成已实现结果。
+> 状态更新：2026-09-14。完整 openvela 工作区已同步，未修改的 Gemini-S1 `nsh_minidisplay` 基线已在 Ubuntu ARM64 上干净构建成功。纯 C 状态机、指针钟数学、晚餐约束、确认记忆和 UI 视图模型已通过 macOS 主机测试及 AddressSanitizer/UBSan。AI Agent 配置、LVGL 真机画面、语音、外设联动与刷机仍需逐项验证；本文不会把这些规划写成已实现结果。
 
 ## 一、作品简介
 
@@ -82,20 +82,20 @@ Gemini-S1 必须唯一匹配序列号 `1234` 与 USB 身份 `18d1:4e11 / NuttX /
 
 ### 3. openvela 构建与真机
 
-尚未宣称完成。准确的环境状态、官方配置路径和构建证据要求见：
+官方未修改基线已构建成功；AI Agent 集成构建与真机刷写尚未完成。准确的环境状态、官方配置路径和构建证据见：
 
 - `docs/ENVIRONMENT_SETUP.md`
 - `docs/BUILD_AND_FLASH.md`
 - `docs/DEVICE_BASELINE.md`
 - `docs/RECOVERY.md`
 
-当前状态为 `BLOCKED_FOR_DISK_AND_DEPENDENCIES` 与 `BLOCKED_FOR_FLASH`。在取得厂商/官方恢复包、确认硬件版本和回滚流程之前，不执行首次刷机。
+当前状态为 `READY_FOR_DEVELOPMENT / BLOCKED_FOR_FLASH`。在取得厂商/官方恢复包、确认硬件版本和回滚流程之前，不执行首次刷机。
 
 ## 五、AI Coding 使用说明
 
 AI 协作目前用于需求拆解、风险边界、官方资料核对、测试先行实现、失败证据保留、隐私扫描和文档整理。每个核心模块先观察预期失败，再写最小实现，并同时运行严格编译警告与 sanitizer。
 
-赛事日志采集器尚未安装。官方采集字段可能包含对话、思考、工具输入与输出，因此必须在完整 `.repo/` 工作区建立后审阅安装脚本，并使用一个新的项目专用会话验证。任何含密码、API Key、私人路径、个人文件或无关对话的会话都不得提交。详情见 `docs/LOGGING_SETUP.md`。
+赛事日志采集器尚未安装。完整 `.repo/` 工作区已经建立，但官方采集字段可能包含对话、思考、工具输入与输出，因此仍须先审阅全局安装影响，并使用一个新的项目专用会话验证。任何含密码、API Key、私人路径、个人文件或无关对话的会话都不得提交。详情见 `docs/LOGGING_SETUP.md`。
 
 ## 六、当前验证状态
 
@@ -104,10 +104,11 @@ AI 协作目前用于需求拆解、风险边界、官方资料核对、测试�
 | Gemini-S1 USB/ADB 身份 | 已验证（只读） | `tests/evidence/device/` |
 | Ubuntu 22.04 ARM64、4 核、8 GB | 已验证 | `tests/evidence/build/` |
 | 核心纯 C 逻辑 | 主机测试通过 | `app/hello_app/tests/host/` |
-| openvela 全量同步与 ARM64 预编译工具 | 未完成 | `docs/ENVIRONMENT_SETUP.md` |
+| openvela 全量同步与 ARM64/兼容主机工具 | 已验证 | `docs/ENVIRONMENT_SETUP.md` |
 | LVGL 真机画面、录放音、ai_agent | 未完成 | 后续真实证据 |
 | 毫米波、MPR121、灯光、摄像头 | 未接入 | 外设保持断开 |
-| 固件构建与首次刷机 | 阻塞 | `docs/BUILD_AND_FLASH.md`、`docs/RECOVERY.md` |
+| 未修改 Gemini-S1 基线构建 | 已通过 | `docs/BUILD_AND_FLASH.md` |
+| AI Agent 固件与首次刷机 | 阻塞 | `docs/BUILD_AND_FLASH.md`、`docs/RECOVERY.md` |
 
 ## 七、隐私与许可证
 

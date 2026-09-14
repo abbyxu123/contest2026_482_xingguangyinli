@@ -15,11 +15,12 @@ The personal repository and the official contest repository have different purpo
 
 ## Current local integration state
 
-- The original desktop `main` remains unchanged.
-- Work is isolated on local branch `codex/environment-bootstrap` in a Git worktree.
-- Local planning history and personal `origin/main` were merged only in that isolated branch.
+- The canonical local team checkout is at `/Users/<USER>/Desktop/xiaomi-openvela-ibbie/local-setup/contest2026_482_xingguangyinli`.
+- Product work is isolated on local branch `codex/living-canvas-core` at `58e1031`.
+- The complete Ubuntu source workspace is at `/home/abby/openvela-workspace`; its team checkout is pinned to official revision `224850b197da7837e60b45573af26a479d366dd9` for reproducible builds.
+- The desktop project uses an ASCII-only canonical path; commands must not reintroduce the former non-ASCII directory name.
 - No branch has been pushed by this setup process.
-- The official contest repository has been inspected read-only in a temporary shallow clone.
+- No fork, pull request, CLA action, or remote mutation has been performed by this setup process.
 
 ## Official manifest mapping
 
@@ -41,16 +42,8 @@ The public fork `https://github.com/abbyxu123/contest2026_482_xingguangyinli` wa
 
 Status: `BLOCKED_FOR_GITHUB_ACCOUNT_ACTION`
 
-## Full openvela workspace gate
+## Full openvela workspace
 
-The official source workspace has not been synchronized yet. The guest currently has about 46 GiB free, while the official minimum is 40 GB before source and build artifacts. This leaves too little recovery margin. Required Ubuntu packages and Git LFS are also not yet installed.
+The Ubuntu virtual disk and root filesystem were expanded, required packages and Git LFS were installed, and the official `repo` launcher was installed in a user-owned directory. `repo sync -c -j2` completed successfully and a revision-pinned manifest was generated. The clean Gemini-S1 board baseline built with exit code `0`; see `docs/ENVIRONMENT_SETUP.md` and `docs/BUILD_AND_FLASH.md`.
 
-Before `repo sync`:
-
-1. Increase the Ubuntu virtual disk or attach a dedicated virtual disk with adequate headroom.
-2. Install and verify required packages, preferably from Ubuntu repositories where available.
-3. Install `repo` in a user-owned bin directory and record its checksum/version.
-4. Run `repo init` with the official team manifest and `--git-lfs`.
-5. Use `repo sync -c -j2` to limit RAM and network pressure on the 16 GB Mac.
-
-Status: `BLOCKED_FOR_DISK_AND_DEPENDENCIES`
+Status: `READY_FOR_DEVELOPMENT`
