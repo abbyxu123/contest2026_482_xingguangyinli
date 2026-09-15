@@ -6,7 +6,7 @@
 
 当前开发节点为 2026 首届 openvela AI 硬件开发者大赛。主控目标是 Gemini-S1（Allwinner R528S3），软件路线为 openvela、LVGL 与 ai_agent。
 
-> 状态更新：2026-09-15。完整 openvela 工作区已同步；未修改基线与 AI Agent + Living Canvas 产品配置均已在 Ubuntu ARM64 上构建成功。构建日志确认八个 Living Canvas 源文件参与编译，ELF 已链接 `living_canvas_main`、Agent 安全状态机与官方 VelaClaw 客户端桥接。九个严格主机测试通过，千问 `qwen3.8-max` 与小米 `mimo-v2.5` 均完成不含项目数据的最小连通验证。Gemini-S1 NAND/EMMC 候选整包已在隔离兼容层中生成并通过退出码、分区尺寸、固件一致性和 NAND boot0 校验；尚未写入实体板。真机画面、Agent 板端运行时、音频播放、外设联动与首次刷机仍需逐项验证；本文不会把这些规划写成已实现结果。
+> 状态更新：2026-09-15。完整 openvela 工作区已同步；未修改基线与 AI Agent + Living Canvas 产品配置均已在 Ubuntu ARM64 上构建成功。最新提交 `f84f15c` 增加了明确标记为离线预览的 LVGL 安全画面，构建日志确认显示模块参与编译，ELF 已链接 `living_canvas_main`、Agent 安全状态机与官方 VelaClaw 客户端桥接。九个严格主机测试通过，千问 `qwen3.8-max` 与小米 `mimo-v2.5` 均完成不含项目数据的最小连通验证。Gemini-S1 NAND/EMMC 候选整包已在隔离兼容层中生成并通过退出码、分区尺寸、功能标记、固件一致性和 NAND boot0 校验；尚未写入实体板。真机画面、Agent 板端运行时、音频播放、外设联动与首次刷机仍需逐项验证；本文不会把这些规划写成已实现结果。
 
 ## 一、作品简介
 
@@ -84,7 +84,7 @@ Gemini-S1 必须唯一匹配序列号 `1234` 与 USB 身份 `18d1:4e11 / NuttX /
 
 ### 3. openvela 构建与真机
 
-官方未修改基线以及 AI Agent + Living Canvas 产品固件均已构建成功；最新固件已包含受限录音会话、Agent 安全状态机、官方 VelaClaw 桥接和 `--agent-prompt` 受限入口，真机刷写尚未执行。准确的环境状态、官方配置路径和构建证据见：
+官方未修改基线以及 AI Agent + Living Canvas 产品固件均已构建成功；最新固件已包含受限录音会话、Agent 安全状态机、官方 VelaClaw 桥接、`--agent-prompt` 受限入口，以及 `living_canvas --ui-preview` 离线安全预览。预览只验证 LCD/LVGL 显示，不连接模型、不采集音视频、不触发设备动作。真机刷写尚未执行。准确的环境状态、官方配置路径和构建证据见：
 
 - `docs/ENVIRONMENT_SETUP.md`
 - `docs/BUILD_AND_FLASH.md`
@@ -109,6 +109,7 @@ AI 协作目前用于需求拆解、风险边界、官方资料核对、测试�
 | openvela 全量同步与 ARM64/兼容主机工具 | 已验证 | `docs/ENVIRONMENT_SETUP.md` |
 | AI Agent + Living Canvas 固件构建 | 已通过（含 Agent 安全桥接） | `tests/evidence/build/gemini-s1-living-canvas-agent-20260915.txt` |
 | Gemini-S1 NAND/EMMC 候选整包 | 已生成并离线校验，未烧录 | `tests/evidence/build/gemini-s1-full-image-20260915.txt` |
+| Gemini-S1 LVGL 离线安全预览 | 已构建并封装，未上板验证 | `tests/evidence/build/gemini-s1-ui-preview-20260915.txt` |
 | 千问 qwen3.8-max 最小连通 | 已验证（Mac、非敏感固定探针） | `tests/evidence/integration/qwen3.8-max-connectivity-20260915.txt` |
 | 小米 MiMo v2.5 最小连通 | 已验证（Mac、非敏感固定探针） | `tests/evidence/integration/mimo-v2.5-connectivity-20260915.txt` |
 | Gemini-S1 板载麦克风采集通路 | 已验证（仅非内容信号） | `tests/evidence/device/gemini-microphone-signal-20260914.txt` |
