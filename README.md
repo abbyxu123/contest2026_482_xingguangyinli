@@ -6,7 +6,7 @@
 
 当前开发节点为 2026 首届 openvela AI 硬件开发者大赛。主控目标是 Gemini-S1（Allwinner R528S3），软件路线为 openvela、LVGL 与 ai_agent。
 
-> 状态更新：2026-09-15。完整 openvela 工作区已同步；未修改基线与 AI Agent + Living Canvas 产品配置均已在 Ubuntu ARM64 上构建成功。构建日志确认八个 Living Canvas 源文件参与编译，ELF 已链接 `living_canvas_main`、Agent 安全状态机与官方 VelaClaw 客户端桥接。九个严格主机测试通过，千问 `qwen3.8-max` 完成一次不含项目数据的最小连通验证。Gemini-S1 NAND/EMMC 候选整包已在隔离兼容层中生成并通过退出码、分区尺寸、固件一致性和 NAND boot0 校验；尚未写入实体板。真机画面、Agent 板端运行时、音频播放、外设联动与首次刷机仍需逐项验证；本文不会把这些规划写成已实现结果。
+> 状态更新：2026-09-15。完整 openvela 工作区已同步；未修改基线与 AI Agent + Living Canvas 产品配置均已在 Ubuntu ARM64 上构建成功。构建日志确认八个 Living Canvas 源文件参与编译，ELF 已链接 `living_canvas_main`、Agent 安全状态机与官方 VelaClaw 客户端桥接。九个严格主机测试通过，千问 `qwen3.8-max` 与小米 `mimo-v2.5` 均完成不含项目数据的最小连通验证。Gemini-S1 NAND/EMMC 候选整包已在隔离兼容层中生成并通过退出码、分区尺寸、固件一致性和 NAND boot0 校验；尚未写入实体板。真机画面、Agent 板端运行时、音频播放、外设联动与首次刷机仍需逐项验证；本文不会把这些规划写成已实现结果。
 
 ## 一、作品简介
 
@@ -110,6 +110,7 @@ AI 协作目前用于需求拆解、风险边界、官方资料核对、测试�
 | AI Agent + Living Canvas 固件构建 | 已通过（含 Agent 安全桥接） | `tests/evidence/build/gemini-s1-living-canvas-agent-20260915.txt` |
 | Gemini-S1 NAND/EMMC 候选整包 | 已生成并离线校验，未烧录 | `tests/evidence/build/gemini-s1-full-image-20260915.txt` |
 | 千问 qwen3.8-max 最小连通 | 已验证（Mac、非敏感固定探针） | `tests/evidence/integration/qwen3.8-max-connectivity-20260915.txt` |
+| 小米 MiMo v2.5 最小连通 | 已验证（Mac、非敏感固定探针） | `tests/evidence/integration/mimo-v2.5-connectivity-20260915.txt` |
 | Gemini-S1 板载麦克风采集通路 | 已验证（仅非内容信号） | `tests/evidence/device/gemini-microphone-signal-20260914.txt` |
 | LVGL 真机画面、音频播放、ai_agent 板端运行时 | 未上板验证 | 后续真实证据 |
 | 毫米波、MPR121、灯光、摄像头 | 未接入 | 外设保持断开 |
