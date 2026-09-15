@@ -12,8 +12,11 @@ if(CONFIG_LVX_USE_DEMO_CONTEST2026_482_LIVING_CANVAS)
       src/lc_voice.c
       src/lc_agent.c
       src/lc_agent_bridge.c
+      src/lc_display.c
     INCLUDE_DIRECTORIES
       ${CMAKE_CURRENT_SOURCE_DIR}/include
       ${NUTTX_APPS_DIR}/packages/ai_agent/include
-    STACKSIZE 4096)
+    DEPENDS
+      lvgl
+    STACKSIZE 40960)
 endif()

@@ -10,7 +10,7 @@ grep -q 'packages/demos/contest2026_482_hello_app' "$app_dir/Make.defs"
 grep -q "CONFIG_$symbol" "$app_dir/Makefile"
 grep -q "CONFIG_$symbol" "$app_dir/CMakeLists.txt"
 
-for source in lc_state.c lc_clock.c lc_dinner.c lc_memory.c lc_voice.c lc_agent.c lc_agent_bridge.c; do
+for source in lc_state.c lc_clock.c lc_dinner.c lc_memory.c lc_voice.c lc_agent.c lc_agent_bridge.c lc_display.c; do
   grep -q "src/$source" "$app_dir/Makefile"
   grep -q "src/$source" "$app_dir/CMakeLists.txt"
 done
@@ -24,6 +24,13 @@ grep -q 'lc_voice_init' "$app_dir/hello_app_main.c"
 grep -q '#include "lc_agent.h"' "$app_dir/hello_app_main.c"
 grep -q '#include "lc_agent_bridge.h"' "$app_dir/hello_app_main.c"
 grep -q -- '--agent-prompt' "$app_dir/hello_app_main.c"
+grep -q '#include "lc_display.h"' "$app_dir/hello_app_main.c"
+grep -q -- '--ui-preview' "$app_dir/hello_app_main.c"
+grep -q 'DEPENDS' "$app_dir/CMakeLists.txt"
+grep -q 'lvgl' "$app_dir/CMakeLists.txt"
+grep -q 'lv_nuttx_init' "$app_dir/src/lc_display.c"
+grep -q '"/dev/lcd0"' "$app_dir/src/lc_display.c"
+grep -q 'SAFE OFFLINE PREVIEW' "$app_dir/src/lc_display.c"
 
 
 if grep -Eq 'CONTEST2026_000|team 000' \

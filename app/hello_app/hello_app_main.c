@@ -3,6 +3,7 @@
  ****************************************************************************/
 
 #include "lc_agent.h"
+#include "lc_display.h"
 #include "lc_state.h"
 #include "lc_voice.h"
 
@@ -129,6 +130,11 @@ int main(int argc, char *argv[])
     }
 
 #ifdef __NuttX__
+  if (argc == 2 && strcmp(argv[1], "--ui-preview") == 0)
+    {
+      return lc_display_run_preview();
+    }
+
   if (argc == 3 && strcmp(argv[1], "--agent-prompt") == 0)
     {
       return run_agent_prompt(argv[2]);
@@ -137,7 +143,8 @@ int main(int argc, char *argv[])
   if (argc != 1)
     {
       fprintf(stderr,
-              "Usage: living_canvas [--agent-prompt \"request\"]\n");
+              "Usage: living_canvas [--ui-preview | "
+              "--agent-prompt \"request\"]\n");
       return 2;
     }
 #else
