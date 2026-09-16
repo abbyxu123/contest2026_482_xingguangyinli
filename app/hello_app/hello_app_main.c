@@ -145,6 +145,11 @@ int main(int argc, char *argv[])
       return lc_display_run_choice_preview();
     }
 
+  if (argc == 3 && strcmp(argv[1], "--competition-demo") == 0)
+    {
+      return lc_display_run_competition_demo(argv[2]);
+    }
+
 #  ifdef __NuttX__
   if (argc == 3 && strcmp(argv[1], "--agent-prompt") == 0)
     {
@@ -157,6 +162,7 @@ int main(int argc, char *argv[])
       fprintf(stderr,
               "Usage: living_canvas [--ui-preview | --image-preview | "
               "--choice-preview | "
+              "--competition-demo <handoff-url> | "
               "--agent-prompt \"request\"]\n");
       return 2;
     }

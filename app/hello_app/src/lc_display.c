@@ -1,5 +1,6 @@
 #include "lc_display.h"
 #include "lc_choice.h"
+#include "lc_competition.h"
 #include "generated/lc_choice_assets.h"
 
 #ifdef __NuttX__
@@ -81,6 +82,14 @@ static void create_preview(void)
 
 static lv_obj_t *g_choice_cards[LC_CHOICE_COUNT];
 static bool g_pulse_bright;
+static lc_competition_t g_competition;
+static lv_obj_t *g_competition_panel;
+static lv_obj_t *g_competition_title;
+static lv_obj_t *g_competition_detail;
+static lv_obj_t *g_competition_badge;
+static lv_timer_t *g_competition_timer;
+static unsigned int g_competition_step;
+static char g_competition_handoff[LC_COMPETITION_QR_URL_MAX];
 
 static void init_image_descriptor(lv_image_dsc_t *descriptor,
                                   const uint8_t *data,
@@ -202,6 +211,140 @@ static void create_choice_overlay(lv_obj_t *screen)
                        choice.selected == LC_CHOICE_HOME);
   g_pulse_bright = true;
   (void)lv_timer_create(pulse_selected_card, 450u, NULL);
+}
+
+static void set_competition_text(const char *title,
+                                 const char *detail,
+                                 const char *badge)
+{
+  lv_label_set_text(g_competition_title, title);
+  lv_label_set_text(g_competition_detail, detail);
+  lv_label_set_text(g_competition_badge, badge);
+}
+
+static void render_competition_state(void)
+{
+  switch (g_competition.state)
+    {
+      case LC_COMPETITION_CHOICE:
+        set_competition_text("WHAT SHALL WE EAT?",
+                             "Takeout is ready to start",
+                             "BAG = HELP ME ORDER");
+        break;
+
+      case LC_COMPETITION_REQUESTING:
+        set_competition_text("BEAGLE IS COORDINATING",
+                             "Finding one warm, reliable dinner...",
+                             "AI + SAFE RULES");
+        break;
+
+      case LC_COMPETITION_RECOMMENDATION:
+        set_competition_text("TOMATO BEEF RICE",
+                             "Warm + balanced | about CNY 32",
+                             g_competition.rules_fallback
+                               ? "SAFE RULES FALLBACK"
+                               : "CAT MEMORY: GOOD MATCH");
+        break;
+
+      case LC_COMPETITION_CONFIRMING:
+        set_competition_text("CONFIRMED ON FRAME",
+                             "Preparing a phone handoff...",
+                             "PAYMENT STAYS ON PHONE");
+        break;
+
+      case LC_COMPETITION_QR:
+        set_competition_text("SCAN ON PHONE", g_competition.qr_url,
+                             "REVIEW + PAY ON PHONE");
+        break;
+
+      case LC_COMPETITION_ERROR:
+        set_competition_text("HANDOFF UNAVAILABLE",
+                             g_competition.error[0] == '\0'
+                               ? "Check the SID gateway and retry"
+                               : g_competition.error,
+                             "SAFE STOP");
+        break;
+    }
+}
+
+static void advance_competition_demo(lv_timer_t *timer)
+{
+  g_competition_step++;
+
+  if (g_competition_step == 1u)
+    {
+      if (!lc_competition_start(&g_competition, LC_CHOICE_TAKEOUT))
+        {
+          lc_competition_fail(&g_competition, "could not start");
+        }
+
+    }
+  else if (g_competition_step == 2u)
+    {
+      if (!lc_competition_set_recommendation(
+            &g_competition, "Tomato beef rice",
+            "Warm, balanced and within budget", "About CNY 32", false))
+        {
+          lc_competition_fail(&g_competition, "invalid recommendation");
+        }
+
+    }
+  else if (g_competition_step == 3u)
+    {
+      if (!lc_competition_confirm(&g_competition))
+        {
+          lc_competition_fail(&g_competition, "could not confirm");
+        }
+
+    }
+  else if (g_competition_step == 4u)
+    {
+      if (!lc_competition_set_handoff(&g_competition,
+                                      g_competition_handoff))
+        {
+          lc_competition_fail(&g_competition, "invalid handoff URL");
+        }
+
+      lv_timer_pause(timer);
+    }
+
+  render_competition_state();
+}
+
+static void create_competition_overlay(lv_obj_t *screen,
+                                       const char *handoff_url)
+{
+  size_t length = strlen(handoff_url);
+
+  lc_competition_init(&g_competition);
+  g_competition_step = 0u;
+  memcpy(g_competition_handoff, handoff_url, length + 1u);
+
+  g_competition_panel = lv_obj_create(screen);
+  lv_obj_remove_style_all(g_competition_panel);
+  lv_obj_set_size(g_competition_panel, LV_PCT(92), 112);
+  lv_obj_align(g_competition_panel, LV_ALIGN_TOP_MID, 0, 8);
+  lv_obj_set_style_bg_color(g_competition_panel, lv_color_hex(0x24150f), 0);
+  lv_obj_set_style_bg_opa(g_competition_panel, LV_OPA_80, 0);
+  lv_obj_set_style_border_color(g_competition_panel,
+                                lv_color_hex(0xffd07b), 0);
+  lv_obj_set_style_border_width(g_competition_panel, 2, 0);
+  lv_obj_set_style_radius(g_competition_panel, 14, 0);
+
+  g_competition_title = lv_label_create(g_competition_panel);
+  configure_label(g_competition_title, 0xffffff);
+  lv_obj_align(g_competition_title, LV_ALIGN_TOP_MID, 0, 12);
+
+  g_competition_detail = lv_label_create(g_competition_panel);
+  configure_label(g_competition_detail, 0xffe9c8);
+  lv_obj_align(g_competition_detail, LV_ALIGN_CENTER, 0, 4);
+
+  g_competition_badge = lv_label_create(g_competition_panel);
+  configure_label(g_competition_badge, 0xffd26a);
+  lv_obj_align(g_competition_badge, LV_ALIGN_BOTTOM_MID, 0, -10);
+
+  render_competition_state();
+  g_competition_timer = lv_timer_create(advance_competition_demo, 1800u, NULL);
 }
 
 static int run_artwork_preview(bool with_choices)
@@ -326,6 +469,80 @@ int lc_display_run_choice_preview(void)
   return run_artwork_preview(true);
 }
 
+int lc_display_run_competition_demo(const char *qr_url)
+{
+  lv_nuttx_dsc_t info;
+  lv_nuttx_result_t result;
+  lv_obj_t *screen;
+  size_t length;
+
+  if (qr_url == NULL ||
+      (strncmp(qr_url, "http://", 7u) != 0 &&
+       strncmp(qr_url, "https://", 8u) != 0))
+    {
+      fprintf(stderr, "Living Canvas requires an HTTP handoff URL\n");
+      return 2;
+    }
+
+  length = strlen(qr_url);
+  if (length == 0u || length >= sizeof(g_competition_handoff))
+    {
+      fprintf(stderr, "Living Canvas handoff URL is too long\n");
+      return 2;
+    }
+
+  if (lv_is_initialized())
+    {
+      fprintf(stderr, "Living Canvas display is already in use\n");
+      return 2;
+    }
+
+#  ifdef NEED_BOARDINIT
+  boardctl(BOARDIOC_INIT, 0);
+#  endif
+
+  lv_init();
+  lv_nuttx_dsc_init(&info);
+#  ifdef CONFIG_LV_USE_NUTTX_LCD
+  info.fb_path = "/dev/lcd0";
+#  endif
+  lv_nuttx_init(&info, &result);
+  if (result.disp == NULL)
+    {
+      fprintf(stderr, "Living Canvas could not open /dev/lcd0\n");
+      lv_nuttx_deinit(&result);
+      lv_deinit();
+      return 2;
+    }
+
+  screen = lv_screen_active();
+  if (!create_background(result.disp, screen))
+    {
+      lv_nuttx_deinit(&result);
+      lv_deinit();
+      return 2;
+    }
+
+  create_choice_overlay(screen);
+  create_competition_overlay(screen, qr_url);
+
+  for (;;)
+    {
+      uint32_t idle = lv_timer_handler();
+
+      if (idle == 0u)
+        {
+          idle = 1u;
+        }
+      else if (idle > 50u)
+        {
+          idle = 50u;
+        }
+
+      usleep(idle * 1000u);
+    }
+}
+
 #else
 
 int lc_display_run_preview(void)
@@ -340,6 +557,12 @@ int lc_display_run_image_preview(void)
 
 int lc_display_run_choice_preview(void)
 {
+  return 2;
+}
+
+int lc_display_run_competition_demo(const char *qr_url)
+{
+  (void)qr_url;
   return 2;
 }
 
