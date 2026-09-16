@@ -129,21 +129,34 @@ int main(int argc, char *argv[])
       return 1;
     }
 
-#ifdef __NuttX__
+#if defined(__NuttX__) || defined(LC_MAIN_HOST_TEST)
   if (argc == 2 && strcmp(argv[1], "--ui-preview") == 0)
     {
       return lc_display_run_preview();
     }
 
+  if (argc == 2 && strcmp(argv[1], "--image-preview") == 0)
+    {
+      return lc_display_run_image_preview();
+    }
+
+  if (argc == 2 && strcmp(argv[1], "--choice-preview") == 0)
+    {
+      return lc_display_run_choice_preview();
+    }
+
+#  ifdef __NuttX__
   if (argc == 3 && strcmp(argv[1], "--agent-prompt") == 0)
     {
       return run_agent_prompt(argv[2]);
     }
+#  endif
 
   if (argc != 1)
     {
       fprintf(stderr,
-              "Usage: living_canvas [--ui-preview | "
+              "Usage: living_canvas [--ui-preview | --image-preview | "
+              "--choice-preview | "
               "--agent-prompt \"request\"]\n");
       return 2;
     }

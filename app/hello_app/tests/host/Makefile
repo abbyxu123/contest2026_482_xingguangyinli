@@ -1,7 +1,7 @@
 CC ?= cc
 CFLAGS ?= -std=c11 -Wall -Wextra -Werror -pedantic -O2
 
-TARGETS := test_lc_state test_lc_clock test_lc_dinner test_lc_memory test_lc_ui test_lc_voice test_lc_agent test_lc_agent_bridge test_lc_main
+TARGETS := test_lc_state test_lc_clock test_lc_dinner test_lc_memory test_lc_ui test_lc_voice test_lc_agent test_lc_agent_bridge test_lc_main test_lc_choice test_lc_sid_contract
 INCLUDES := -I../../include
 
 .PHONY: all test clean
@@ -35,6 +35,12 @@ test_lc_memory: test_lc_memory.c ../../src/lc_memory.c ../../include/lc_memory.h
 test_lc_ui: test_lc_ui.c ../../src/lc_ui.c ../../src/lc_clock.c ../../include/lc_ui.h
 	$(CC) $(CFLAGS) $(INCLUDES) test_lc_ui.c ../../src/lc_ui.c ../../src/lc_clock.c -o $@
 
+test_lc_choice: test_lc_choice.c ../../src/lc_choice.c ../../include/lc_choice.h
+	$(CC) $(CFLAGS) $(INCLUDES) test_lc_choice.c ../../src/lc_choice.c -o $@
+
+test_lc_sid_contract: test_lc_sid_contract.c ../../src/lc_sid_contract.c ../../src/lc_choice.c ../../include/lc_sid_contract.h ../../include/lc_choice.h
+	$(CC) $(CFLAGS) $(INCLUDES) test_lc_sid_contract.c ../../src/lc_sid_contract.c ../../src/lc_choice.c -o $@
+
 test: $(TARGETS)
 	./test_lc_state
 	./test_lc_clock
@@ -45,6 +51,8 @@ test: $(TARGETS)
 	./test_lc_agent
 	./test_lc_agent_bridge
 	./test_lc_main
+	./test_lc_choice
+	./test_lc_sid_contract
 
 clean:
 	rm -rf $(TARGETS) $(addsuffix .dSYM,$(TARGETS))
