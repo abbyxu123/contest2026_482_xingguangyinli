@@ -27,6 +27,19 @@ static void test_takeout_contract(void)
   assert(strstr(json, "\"channel\":\"delivery\"") != NULL);
 }
 
+static void test_session_and_confirmation_payloads(void)
+{
+  char json[96];
+
+  assert(lc_sid_build_session_json("gemini-s1", json, sizeof(json)));
+  assert(strcmp(json, "{\"device_id\":\"gemini-s1\"}") == 0);
+
+  assert(lc_sid_build_confirm_json("sess_12ab34cd56ef", json,
+                                   sizeof(json)));
+  assert(strcmp(json,
+                "{\"session_id\":\"sess_12ab34cd56ef\"}") == 0);
+}
+
 static void test_mystery_and_home_mapping(void)
 {
   lc_sid_contract_t mystery;
@@ -53,12 +66,16 @@ static void test_rejects_unsafe_or_truncated_session_ids(void)
                                   sizeof(json)));
   assert(!lc_sid_build_input_json(&contract, "sess_123", json,
                                   sizeof(json)));
+  assert(!lc_sid_build_session_json("bad\"device", json, sizeof(json)));
+  assert(!lc_sid_build_confirm_json("bad/id", json, sizeof(json)));
+  assert(!lc_sid_build_confirm_json("sess_123", json, 8u));
 }
 
 int main(void)
 {
   test_fixed_endpoints();
   test_takeout_contract();
+  test_session_and_confirmation_payloads();
   test_mystery_and_home_mapping();
   test_rejects_unsafe_or_truncated_session_ids();
   puts("PASS: lc_sid_contract");
