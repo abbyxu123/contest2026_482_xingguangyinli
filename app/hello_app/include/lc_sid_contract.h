@@ -20,9 +20,15 @@ typedef struct
 
 bool lc_sid_contract_for_choice(lc_choice_id_t choice,
                                 lc_sid_contract_t *contract);
+bool lc_sid_build_session_json(const char *device_id,
+                               char *output,
+                               size_t output_capacity);
 bool lc_sid_build_input_json(const lc_sid_contract_t *contract,
                              const char *session_id,
                              char *output,
                              size_t output_capacity);
+bool lc_sid_build_confirm_json(const char *session_id,
+                               char *output,
+                               size_t output_capacity);
 
 #endif

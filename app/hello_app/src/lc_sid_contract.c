@@ -3,26 +3,44 @@
 #include <ctype.h>
 #include <stdio.h>
 
-static bool valid_session_id(const char *session_id)
+static bool valid_identifier(const char *value)
 {
   size_t index;
 
-  if (session_id == NULL || session_id[0] == '\0')
+  if (value == NULL || value[0] == '\0')
     {
       return false;
     }
 
-  for (index = 0u; session_id[index] != '\0'; index++)
+  for (index = 0u; value[index] != '\0'; index++)
     {
-      unsigned char value = (unsigned char)session_id[index];
+      unsigned char character = (unsigned char)value[index];
       if (index >= 63u ||
-          (!isalnum(value) && value != '_' && value != '-'))
+          (!isalnum(character) && character != '_' && character != '-'))
         {
           return false;
         }
     }
 
   return true;
+}
+
+static bool build_identifier_json(const char *field,
+                                  const char *value,
+                                  char *output,
+                                  size_t output_capacity)
+{
+  int length;
+
+  if (field == NULL || !valid_identifier(value) || output == NULL ||
+      output_capacity == 0u)
+    {
+      return false;
+    }
+
+  length = snprintf(output, output_capacity, "{\"%s\":\"%s\"}",
+                    field, value);
+  return length >= 0 && (size_t)length < output_capacity;
 }
 
 bool lc_sid_contract_for_choice(lc_choice_id_t choice,
@@ -59,6 +77,14 @@ bool lc_sid_contract_for_choice(lc_choice_id_t choice,
     }
 }
 
+bool lc_sid_build_session_json(const char *device_id,
+                               char *output,
+                               size_t output_capacity)
+{
+  return build_identifier_json("device_id", device_id, output,
+                               output_capacity);
+}
+
 bool lc_sid_build_input_json(const lc_sid_contract_t *contract,
                              const char *session_id,
                              char *output,
@@ -69,7 +95,7 @@ bool lc_sid_build_input_json(const lc_sid_contract_t *contract,
   if (contract == NULL || contract->input_text == NULL ||
       contract->channel == NULL || contract->novelty == NULL ||
       output == NULL || output_capacity == 0u ||
-      !valid_session_id(session_id))
+      !valid_identifier(session_id))
     {
       return false;
     }
@@ -81,4 +107,12 @@ bool lc_sid_build_input_json(const lc_sid_contract_t *contract,
                     session_id, contract->input_text, contract->novelty,
                     contract->channel);
   return length >= 0 && (size_t)length < output_capacity;
+}
+
+bool lc_sid_build_confirm_json(const char *session_id,
+                               char *output,
+                               size_t output_capacity)
+{
+  return build_identifier_json("session_id", session_id, output,
+                               output_capacity);
 }
