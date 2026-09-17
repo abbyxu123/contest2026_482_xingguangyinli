@@ -1,4 +1,4 @@
-#include "lc_sid_contract.h"
+#include "lc_backend_contract.h"
 
 #include <ctype.h>
 #include <stdio.h>
@@ -43,8 +43,8 @@ static bool build_identifier_json(const char *field,
   return length >= 0 && (size_t)length < output_capacity;
 }
 
-bool lc_sid_contract_for_choice(lc_choice_id_t choice,
-                                lc_sid_contract_t *contract)
+bool lc_backend_contract_for_choice(lc_choice_id_t choice,
+                                    lc_backend_contract_t *contract)
 {
   if (contract == NULL)
     {
@@ -63,13 +63,13 @@ bool lc_sid_contract_for_choice(lc_choice_id_t choice,
       case LC_CHOICE_MYSTERY:
         contract->input_text = "从我过去喜欢的外卖品类里随机推荐一个";
         contract->channel = "delivery";
-        contract->novelty = "bold";
+        contract->novelty = "exploratory";
         return true;
 
       case LC_CHOICE_HOME:
         contract->input_text = "查看冰箱里的食材并建议在家吃什么";
-        contract->channel = "dine_in";
-        contract->novelty = "conservative";
+        contract->channel = "pickup";
+        contract->novelty = "familiar";
         return true;
 
       default:
@@ -77,18 +77,18 @@ bool lc_sid_contract_for_choice(lc_choice_id_t choice,
     }
 }
 
-bool lc_sid_build_session_json(const char *device_id,
-                               char *output,
-                               size_t output_capacity)
+bool lc_backend_build_session_json(const char *device_id,
+                                   char *output,
+                                   size_t output_capacity)
 {
   return build_identifier_json("device_id", device_id, output,
                                output_capacity);
 }
 
-bool lc_sid_build_input_json(const lc_sid_contract_t *contract,
-                             const char *session_id,
-                             char *output,
-                             size_t output_capacity)
+bool lc_backend_build_input_json(const lc_backend_contract_t *contract,
+                                 const char *session_id,
+                                 char *output,
+                                 size_t output_capacity)
 {
   int length;
 
@@ -101,18 +101,33 @@ bool lc_sid_build_input_json(const lc_sid_contract_t *contract,
     }
 
   length = snprintf(output, output_capacity,
-                    "{\"session_id\":\"%s\",\"text\":\"%s\","
-                    "\"soft_preferences\":{\"novelty\":\"%s\"},"
-                    "\"context\":{\"channel\":\"%s\"}}",
-                    session_id, contract->input_text, contract->novelty,
-                    contract->channel);
+                    "{\"session_id\":\"%s\","
+                    "\"context\":{\"people\":1,\"occasion\":\"晚餐\"},"
+                    "\"hard_constraints\":{" 
+                    "\"max_total_price_cny\":50,"
+                    "\"max_delivery_minutes\":30,"
+                    "\"channel\":\"%s\","
+                    "\"allergens\":[],\"diet_taboos\":[],\"dislikes\":[]},"
+                    "\"soft_preferences\":{" 
+                    "\"cuisines\":[],\"temperatures\":[],"
+                    "\"preferred_tags\":[],\"novelty\":\"%s\"}}",
+                    session_id, contract->channel, contract->novelty);
   return length >= 0 && (size_t)length < output_capacity;
 }
 
-bool lc_sid_build_confirm_json(const char *session_id,
-                               char *output,
-                               size_t output_capacity)
+bool lc_backend_build_confirm_json(const char *session_id,
+                                   char *output,
+                                   size_t output_capacity)
 {
-  return build_identifier_json("session_id", session_id, output,
-                               output_capacity);
+  int length;
+
+  if (!valid_identifier(session_id) || output == NULL || output_capacity == 0u)
+    {
+      return false;
+    }
+
+  length = snprintf(output, output_capacity,
+                    "{\"session_id\":\"%s\",\"platform\":\"eleme\"}",
+                    session_id);
+  return length >= 0 && (size_t)length < output_capacity;
 }
