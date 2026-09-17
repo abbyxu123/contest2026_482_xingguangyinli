@@ -2,11 +2,11 @@
 
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
-**Goal:** Build and verify the smallest Gemini S1 takeout flow from Living Canvas choice screen to a SID phone-handoff QR code.
+**Goal:** Build and verify the smallest Gemini S1 takeout flow from Living Canvas choice screen to a Living Canvas phone-handoff QR code.
 
-**Architecture:** Add a pure-C, transport-independent controller to the existing Living Canvas application, then connect it to the current SID contract and LVGL display. Keep SID as the backend and keep all board visuals in the Living Canvas asset set. Hardware network and button adapters are isolated so the core flow can be tested before UART-assisted device validation.
+**Architecture:** Add a pure-C, transport-independent controller to the existing Living Canvas application, then connect it to the owned backend contract and LVGL display. Keep all backend and board visuals in the Living Canvas project. Hardware network and button adapters are isolated so the core flow can be tested before UART-assisted device validation.
 
-**Tech Stack:** C11, openvela/NuttX, LVGL, existing SID FastAPI gateway, MiMo through an OpenAI-compatible API, host `make` tests.
+**Tech Stack:** C11, openvela/NuttX, LVGL, Living Canvas FastAPI backend, MiMo through an OpenAI-compatible API, host `make` tests.
 
 ---
 
@@ -45,12 +45,12 @@ git add app/hello_app/include/lc_competition.h app/hello_app/src/lc_competition.
 git commit -m "feat: add competition takeout controller"
 ```
 
-### Task 2: Complete the SID request boundary
+### Task 2: Complete the Living Canvas backend request boundary
 
 **Files:**
-- Modify: `app/hello_app/include/lc_sid_contract.h`
-- Modify: `app/hello_app/src/lc_sid_contract.c`
-- Modify: `app/hello_app/tests/host/test_lc_sid_contract.c`
+- Modify: `app/hello_app/include/lc_backend_contract.h`
+- Modify: `app/hello_app/src/lc_backend_contract.c`
+- Modify: `app/hello_app/tests/host/test_lc_backend_contract.c`
 
 **Step 1: Write the failing test**
 
@@ -58,7 +58,7 @@ Require bounded JSON for session creation, input, and final confirmation; reject
 
 **Step 2: Run test to verify it fails**
 
-Run: `make test_lc_sid_contract && ./test_lc_sid_contract`
+Run: `make test_lc_backend_contract && ./test_lc_backend_contract`
 
 Expected: FAIL because session and confirmation builders are missing.
 
@@ -68,15 +68,15 @@ Add only the payload builders used by the P0 takeout flow.
 
 **Step 4: Run test to verify it passes**
 
-Run: `make test_lc_sid_contract && ./test_lc_sid_contract`
+Run: `make test_lc_backend_contract && ./test_lc_backend_contract`
 
-Expected: `PASS: lc_sid_contract`.
+Expected: `PASS: lc_backend_contract`.
 
 **Step 5: Commit**
 
 ```bash
-git add app/hello_app/include/lc_sid_contract.h app/hello_app/src/lc_sid_contract.c app/hello_app/tests/host/test_lc_sid_contract.c
-git commit -m "feat: complete SID handoff contract"
+git add app/hello_app/include/lc_backend_contract.h app/hello_app/src/lc_backend_contract.c app/hello_app/tests/host/test_lc_backend_contract.c
+git commit -m "feat: complete Living Canvas handoff contract"
 ```
 
 ### Task 3: Add the Living Canvas competition renderer
@@ -119,28 +119,28 @@ git add app/hello_app
 git commit -m "feat: render Living Canvas competition flow"
 ```
 
-### Task 4: Verify SID backend modes on the Mac
+### Task 4: Verify Living Canvas backend modes on the Mac
 
 **Files:**
-- Create: `scripts/verify_sid_gateway.sh`
+- Create: `scripts/host/verify_living_canvas_backend.py`
 - Create: `tests/evidence/backend/.gitkeep`
 - Modify: `docs/BUILD_AND_FLASH.md`
 
 **Step 1: Write a failing gateway smoke check**
 
 Check health, session creation, takeout input, second confirmation, compact QR
-redirect, and rules-only completion against a configurable SID directory.
+redirect, and rules-only completion against the in-repository backend.
 
 **Step 2: Run it against a stopped gateway**
 
-Run: `sh scripts/verify_sid_gateway.sh`
+Run: `./scripts/host/verify_living_canvas_backend.py`
 
 Expected: FAIL with an actionable gateway-unreachable message.
 
-**Step 3: Start the current SID gateway with rules fallback**
+**Step 3: Start the Living Canvas backend with rules fallback**
 
-Use the existing `/Users/beibeixv/Desktop/SID` tree without replacing its dirty
-working copy. Keep secrets outside the contest repository.
+Start `backend/src/living_canvas_backend` from this repository. Keep secrets
+outside the contest repository.
 
 **Step 4: Run the smoke check**
 
@@ -198,7 +198,7 @@ Use the vendor-supported path confirmed from the UART log.
 
 **Step 4: Validate the physical story**
 
-Verify display orientation/color, buttons, SID connectivity, MiMo result,
+Verify display orientation/color, buttons, backend connectivity, MiMo result,
 rules fallback, second confirmation, QR scan, cancel, and reboot recovery.
 
 **Step 5: Record evidence**

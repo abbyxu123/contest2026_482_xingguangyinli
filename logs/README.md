@@ -11,7 +11,7 @@ logs/
 └── <github_login>/              # 你的 GitHub 用户名，一人一目录
     ├── manifest.json            # 会话清单
     └── <date>/                  # 日期 YYYY-MM-DD
-        └── <tool>__<sid>.jsonl  # 一个会话一个文件（工具名与 session id 用 __ 连接）
+        └── <tool>__<session-id>.jsonl  # 一个会话一个文件（工具名与 session id 用 __ 连接）
 ```
 
 - `<tool>`：`claude-code` / `opencode` / `codex` / `kiro`
