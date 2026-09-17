@@ -1,26 +1,34 @@
 import re
+import os
 from pathlib import Path
+from typing import Optional
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse
 
 from .decision import load_catalog, recommend
 from .handoff import build_platform_search_url, is_allowed_url
+from .memory import MemoryStore
 from .schema import (
     BoardInputRequest,
     ConfirmRequest,
     DeviceEventRequest,
+    FeedbackRequest,
     SessionCreateRequest,
     SessionState,
 )
 from .session_store import SessionStore
 
 
-def create_app() -> FastAPI:
+def create_app(data_dir: Optional[Path] = None) -> FastAPI:
     app = FastAPI(title="Living Canvas Decision Backend", version="0.1.0")
     sessions = SessionStore(max_sessions=200)
+    memory = MemoryStore(
+        Path(data_dir or os.environ.get("LIVING_CANVAS_DATA_DIR", "./var"))
+    )
     catalog = load_catalog()
     app.state.sessions = sessions
+    app.state.memory = memory
 
     @app.get("/health")
     def health():
@@ -132,6 +140,30 @@ def create_app() -> FastAPI:
     def phone_console():
         html_path = Path(__file__).with_name("static") / "console.html"
         return HTMLResponse(html_path.read_text(encoding="utf-8"))
+
+    @app.post("/v1/feedback", status_code=201)
+    def save_feedback(request: FeedbackRequest):
+        session = sessions.get(request.session_id)
+        if session is None:
+            raise HTTPException(status_code=404, detail="session_not_found")
+        if session.state != SessionState.HANDED_OFF or session.recommendation is None:
+            raise HTTPException(status_code=409, detail="confirmed_choice_required")
+        return memory.add_feedback(
+            session_id=request.session_id,
+            candidate_id=session.recommendation.candidate.candidate_id,
+            liked=request.liked,
+            note=request.note or "",
+            remember_preferences=request.remember_preferences,
+        )
+
+    @app.get("/v1/memory")
+    def list_memory():
+        return memory.list_all()
+
+    @app.delete("/v1/memory")
+    def delete_memory():
+        memory.delete_all()
+        return {"deleted": True}
 
     return app
 

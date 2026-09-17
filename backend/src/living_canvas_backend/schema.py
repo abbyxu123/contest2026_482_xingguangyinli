@@ -102,3 +102,11 @@ class DeviceEventRequest(StrictModel):
 class ConfirmRequest(StrictModel):
     session_id: str
     platform: str
+
+
+class FeedbackRequest(StrictModel):
+    session_id: str
+    liked: bool
+    note: Optional[str] = Field(default=None, max_length=500)
+    temporary_preferences: List[str] = Field(default_factory=list)
+    remember_preferences: List[str] = Field(default_factory=list)
