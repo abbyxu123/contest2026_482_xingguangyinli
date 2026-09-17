@@ -1,6 +1,6 @@
 # Gemini-S1 Build and Flash Baseline
 
-Last verified: 2026-09-14 (Asia/Shanghai)
+Last verified: 2026-09-17 (Asia/Shanghai)
 
 ## Source provenance
 
@@ -87,6 +87,30 @@ QEMU_SET_ENV=LD_LIBRARY_PATH=/home/abby/.local/share/openvela-x86_64-jammy/root/
 Verification proved that `hello_app_main.c`, `lc_clock.c`, `lc_dinner.c`, `lc_memory.c`, `lc_state.c`, and `lc_ui.c` compiled, and `nuttx.elf` contains the public symbol `living_canvas_main`. The board image is `6,003,600` bytes with SHA-256 `876a09162538bb84415cc588a3a0240ccb8b6af5fb24401b61a0c1d27d6cc778`.
 
 The ignored local backup is under `local-setup/backups/gemini-s1-living-canvas-20260914/`. Complete commands, commits, output hashes, and the post-build repository-state qualification are recorded in `tests/evidence/build/gemini-s1-living-canvas-20260914.txt`.
+
+### Independent decision-backend integration
+
+Status: `HOST_FLOW_PASSED / TARGET_REBUILD_PENDING_VM_LOGIN`
+
+The contest repository now contains its own `backend/src/living_canvas_backend`
+package. The Gemini-S1 request boundary uses only `lc_backend_contract` names and
+the owned `/v1/session`, `/v1/input`, `/v1/device/event`, and `/v1/confirm`
+contract. The backend applies hard constraints before either model or rules
+selection, requires explicit device confirmation, and hands off to a
+whitelisted phone search URL without submitting an order or payment.
+
+On 2026-09-17 the real local HTTP flow passed from session creation through the
+compact QR redirect. Thirty-three backend tests, twelve strict C host tests,
+the openvela build-metadata check, the LVGL build-metadata check, and the
+Living-Canvas-only branding gate also passed. See
+`tests/evidence/integration/living-canvas-backend-flow-20260917.txt`.
+
+The current source has not yet been rebuilt inside Ubuntu. The UTM guest was
+running, but the guest agent was unavailable and SSH required credentials not
+available to the automated build session. No source was copied to the guest and
+no new target image was produced. This access boundary is recorded in
+`tests/evidence/build/gemini-s1-living-canvas-backend-20260917.txt`; it is not a
+compiler failure and does not alter the earlier verified image.
 
 ### Bounded-voice product rebuild
 
