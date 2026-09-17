@@ -92,3 +92,13 @@ class BoardInputRequest(StrictModel):
     context: MealContext
     hard_constraints: BoardHardConstraints
     soft_preferences: SoftPreferences = Field(default_factory=SoftPreferences)
+
+
+class DeviceEventRequest(StrictModel):
+    session_id: str
+    event: str
+
+
+class ConfirmRequest(StrictModel):
+    session_id: str
+    platform: str
