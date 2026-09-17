@@ -69,3 +69,26 @@ class DecisionSession(StrictModel):
     soft_preferences: SoftPreferences = Field(default_factory=SoftPreferences)
     recommendation: Optional[Recommendation] = None
     metadata: Dict[str, str] = Field(default_factory=dict)
+
+
+class SessionCreateRequest(StrictModel):
+    device_id: Optional[str] = Field(default=None, max_length=80)
+
+
+class BoardHardConstraints(StrictModel):
+    max_total_price_cny: float = Field(gt=0)
+    max_delivery_minutes: int = Field(gt=0)
+    channel: str = Field(min_length=1)
+    allergens: List[str] = Field(default_factory=list)
+    diet_taboos: List[str] = Field(default_factory=list)
+    dislikes: List[str] = Field(default_factory=list)
+
+    def as_domain(self) -> HardConstraints:
+        return HardConstraints(**self.model_dump())
+
+
+class BoardInputRequest(StrictModel):
+    session_id: str
+    context: MealContext
+    hard_constraints: BoardHardConstraints
+    soft_preferences: SoftPreferences = Field(default_factory=SoftPreferences)
