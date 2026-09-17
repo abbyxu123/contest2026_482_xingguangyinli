@@ -87,6 +87,9 @@ static lv_obj_t *g_competition_panel;
 static lv_obj_t *g_competition_title;
 static lv_obj_t *g_competition_detail;
 static lv_obj_t *g_competition_badge;
+#  if LV_USE_QRCODE
+static lv_obj_t *g_competition_qr;
+#  endif
 static lv_timer_t *g_competition_timer;
 static unsigned int g_competition_step;
 static char g_competition_handoff[LC_COMPETITION_QR_URL_MAX];
@@ -226,6 +229,23 @@ static void set_competition_text(const char *title,
 
 static void render_competition_state(void)
 {
+  unsigned int index;
+
+#  if LV_USE_QRCODE
+  if (g_competition_qr != NULL)
+    {
+      lv_obj_add_flag(g_competition_qr, LV_OBJ_FLAG_HIDDEN);
+    }
+#  endif
+
+  for (index = 0u; index < LC_CHOICE_COUNT; index++)
+    {
+      if (g_choice_cards[index] != NULL)
+        {
+          lv_obj_remove_flag(g_choice_cards[index], LV_OBJ_FLAG_HIDDEN);
+        }
+    }
+
   switch (g_competition.state)
     {
       case LC_COMPETITION_CHOICE:
@@ -258,8 +278,29 @@ static void render_competition_state(void)
         break;
 
       case LC_COMPETITION_QR:
-        set_competition_text("SCAN ON PHONE", g_competition.qr_url,
-                             "REVIEW + PAY ON PHONE");
+        for (index = 0u; index < LC_CHOICE_COUNT; index++)
+          {
+            lv_obj_add_flag(g_choice_cards[index], LV_OBJ_FLAG_HIDDEN);
+          }
+#  if LV_USE_QRCODE
+        if (lv_qrcode_update(g_competition_qr, g_competition.qr_url,
+                             (uint32_t)strlen(g_competition.qr_url)) !=
+            LV_RESULT_OK)
+          {
+            lc_competition_fail(&g_competition, "QR generation failed");
+            set_competition_text("HANDOFF UNAVAILABLE",
+                                 g_competition.error, "SAFE STOP");
+            break;
+          }
+
+        lv_obj_remove_flag(g_competition_qr, LV_OBJ_FLAG_HIDDEN);
+        set_competition_text("SCAN ON PHONE", "Review the order there",
+                             "PAYMENT STAYS ON PHONE");
+#  else
+        lc_competition_fail(&g_competition, "QR module is disabled");
+        set_competition_text("HANDOFF UNAVAILABLE", g_competition.error,
+                             "SAFE STOP");
+#  endif
         break;
 
       case LC_COMPETITION_ERROR:
@@ -347,6 +388,15 @@ static void create_competition_overlay(lv_obj_t *screen,
   g_competition_badge = lv_label_create(g_competition_panel);
   configure_label(g_competition_badge, 0xffd26a);
   lv_obj_align(g_competition_badge, LV_ALIGN_BOTTOM_MID, 0, -10);
+
+#  if LV_USE_QRCODE
+  g_competition_qr = lv_qrcode_create(screen);
+  lv_qrcode_set_size(g_competition_qr, 124);
+  lv_qrcode_set_dark_color(g_competition_qr, lv_color_hex(0x1d130f));
+  lv_qrcode_set_light_color(g_competition_qr, lv_color_hex(0xfff7e8));
+  lv_obj_align(g_competition_qr, LV_ALIGN_CENTER, 0, 25);
+  lv_obj_add_flag(g_competition_qr, LV_OBJ_FLAG_HIDDEN);
+#  endif
 
   render_competition_state();
   g_competition_timer = lv_timer_create(advance_competition_demo, 1800u, NULL);
