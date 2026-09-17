@@ -6,6 +6,8 @@
 
 当前开发节点为 2026 首届 openvela AI 硬件开发者大赛。主控目标是 Gemini-S1（Allwinner R528S3），软件路线为 openvela、LVGL 与 ai_agent。
 
+当前比赛 P0 只承诺一条可验收链路：画面中的比格犬协调“帮我点外卖”，美短猫读取口味记忆，用户在画框上二次确认后，用手机继续核对并付款。SID 只作为后台推荐与交接服务，不复用它原来的猫咪界面。鸽子、小猪和外星人分别保留给天气/提醒、食材/轻营养、探索/盲盒视角；它们是同一个主 Agent 的前台角色，不是五套各自持有权限的 Agent。
+
 > 状态更新：2026-09-15。完整 openvela 工作区已同步；未修改基线与 AI Agent + Living Canvas 产品配置均已在 Ubuntu ARM64 上构建成功。最新提交 `f84f15c` 增加了明确标记为离线预览的 LVGL 安全画面，构建日志确认显示模块参与编译，ELF 已链接 `living_canvas_main`、Agent 安全状态机与官方 VelaClaw 客户端桥接。九个严格主机测试通过，千问 `qwen3.8-max` 与小米 `mimo-v2.5` 均完成不含项目数据的最小连通验证。Gemini-S1 NAND/EMMC 候选整包已在隔离兼容层中生成并通过退出码、分区尺寸、功能标记、固件一致性和 NAND boot0 校验；尚未写入实体板。真机画面、Agent 板端运行时、音频播放、外设联动与首次刷机仍需逐项验证；本文不会把这些规划写成已实现结果。
 
 ## 一、作品简介
@@ -82,7 +84,17 @@ bash scripts/device/verify_usb_inventory.sh
 
 Gemini-S1 必须唯一匹配序列号 `1234` 与 USB 身份 `18d1:4e11 / NuttX / Debug Bridge`。外设断开时会明确显示 `MISSING`；`--require-all` 仅用于完整硬件盘点。
 
-### 3. openvela 构建与真机
+### 3. SID 后台闭环检查
+
+先在本机启动 SID 网关，再执行：
+
+```bash
+./scripts/host/verify_sid_gateway.py --base-url http://127.0.0.1:8090
+```
+
+脚本会真实创建 Gemini-S1 会话，以比赛演示默认值（1 人、50 元、30 分钟）获得一个候选，模拟板端二次确认，检查外卖跳转，并验证短二维码地址能以 HTTP 307 接到同一会话的手机页。脚本不会提交付款。
+
+### 4. openvela 构建与真机
 
 官方未修改基线以及 AI Agent + Living Canvas 产品固件均已构建成功；最新固件已包含受限录音会话、Agent 安全状态机、官方 VelaClaw 桥接、`--agent-prompt` 受限入口，以及 `living_canvas --ui-preview` 离线安全预览。预览只验证 LCD/LVGL 显示，不连接模型、不采集音视频、不触发设备动作。真机刷写尚未执行。准确的环境状态、官方配置路径和构建证据见：
 
