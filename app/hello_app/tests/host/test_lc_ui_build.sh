@@ -15,6 +15,13 @@ grep -q 'LC_COMPETITION_RECOMMENDATION' "$app_dir/src/lc_display.c"
 grep -q 'LC_COMPETITION_CONFIRMING' "$app_dir/src/lc_display.c"
 grep -q 'LC_COMPETITION_QR' "$app_dir/src/lc_display.c"
 grep -q 'LC_COMPETITION_ERROR' "$app_dir/src/lc_display.c"
+grep -q 'g_competition.dish' "$app_dir/src/lc_display.c"
+grep -q 'g_competition.reason' "$app_dir/src/lc_display.c"
+grep -q 'g_competition.price' "$app_dir/src/lc_display.c"
+if grep -q 'TOMATO BEEF RICE' "$app_dir/src/lc_display.c"; then
+  echo 'FAIL: competition renderer still hard-codes the recommended dish' >&2
+  exit 1
+fi
 grep -q '_Static_assert(sizeof(lc_bg_portrait)' \
   "$app_dir/src/generated/lc_choice_assets.c"
 

@@ -90,6 +90,8 @@ static lv_obj_t *g_competition_badge;
 static lv_timer_t *g_competition_timer;
 static unsigned int g_competition_step;
 static char g_competition_handoff[LC_COMPETITION_QR_URL_MAX];
+static char g_competition_detail_text[LC_COMPETITION_REASON_MAX +
+                                      LC_COMPETITION_PRICE_MAX + 4u];
 
 static void init_image_descriptor(lv_image_dsc_t *descriptor,
                                   const uint8_t *data,
@@ -239,8 +241,11 @@ static void render_competition_state(void)
         break;
 
       case LC_COMPETITION_RECOMMENDATION:
-        set_competition_text("TOMATO BEEF RICE",
-                             "Warm + balanced | about CNY 32",
+        (void)snprintf(g_competition_detail_text,
+                       sizeof(g_competition_detail_text), "%s | %s",
+                       g_competition.reason, g_competition.price);
+        set_competition_text(g_competition.dish,
+                             g_competition_detail_text,
                              g_competition.rules_fallback
                                ? "SAFE RULES FALLBACK"
                                : "CAT MEMORY: GOOD MATCH");
