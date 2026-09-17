@@ -7,8 +7,10 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse
 
 from .decision import load_catalog, recommend
+from .constraints import filter_candidates
 from .handoff import build_platform_search_url, is_allowed_url
 from .memory import MemoryStore
+from .model_gateway import ModelGateway
 from .schema import (
     BoardInputRequest,
     ConfirmRequest,
@@ -20,12 +22,16 @@ from .schema import (
 from .session_store import SessionStore
 
 
-def create_app(data_dir: Optional[Path] = None) -> FastAPI:
+def create_app(
+    data_dir: Optional[Path] = None,
+    model_gateway: Optional[ModelGateway] = None,
+) -> FastAPI:
     app = FastAPI(title="Living Canvas Decision Backend", version="0.1.0")
     sessions = SessionStore(max_sessions=200)
     memory = MemoryStore(
         Path(data_dir or os.environ.get("LIVING_CANVAS_DATA_DIR", "./var"))
     )
+    model_gateway = model_gateway or ModelGateway.from_env()
     catalog = load_catalog()
     app.state.sessions = sessions
     app.state.memory = memory
@@ -48,10 +54,15 @@ def create_app(data_dir: Optional[Path] = None) -> FastAPI:
             raise HTTPException(status_code=404, detail="session_not_found")
 
         constraints = request.hard_constraints.as_domain()
+        allowed, _ = filter_candidates(catalog, constraints)
+        model_choice = model_gateway.choose(allowed, request.soft_preferences)
         recommendation = recommend(
             catalog,
             constraints,
             request.soft_preferences,
+            model_candidate_id=(
+                model_choice.candidate_id if model_choice is not None else None
+            ),
         )
         if recommendation is None:
             raise HTTPException(status_code=409, detail="no_safe_candidate")
