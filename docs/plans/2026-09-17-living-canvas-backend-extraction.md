@@ -296,10 +296,10 @@ git commit -m "feat: add optional model recommendation adapter"
 ### Task 8: Rename the Gemini S1 contract and live verification script
 
 **Files:**
-- Rename: `app/hello_app/include/lc_sid_contract.h` to `app/hello_app/include/lc_backend_contract.h`
-- Rename: `app/hello_app/src/lc_sid_contract.c` to `app/hello_app/src/lc_backend_contract.c`
-- Rename: `app/hello_app/tests/host/test_lc_sid_contract.c` to `app/hello_app/tests/host/test_lc_backend_contract.c`
-- Rename: `scripts/host/verify_sid_gateway.py` to `scripts/host/verify_living_canvas_backend.py`
+- Rename the board contract header to `app/hello_app/include/lc_backend_contract.h`
+- Rename the board contract implementation to `app/hello_app/src/lc_backend_contract.c`
+- Rename its host test to `app/hello_app/tests/host/test_lc_backend_contract.c`
+- Rename the live check to `scripts/host/verify_living_canvas_backend.py`
 - Modify: `app/hello_app/CMakeLists.txt`
 - Modify: `app/hello_app/Makefile`
 - Modify: `app/hello_app/tests/host/Makefile`
@@ -436,4 +436,3 @@ they are observed on the Gemini S1.
 git add docs/BUILD_AND_FLASH.md tests/evidence
 git commit -m "test: verify Living Canvas backend integration"
 ```
-
