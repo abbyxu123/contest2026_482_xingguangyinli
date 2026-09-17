@@ -23,10 +23,10 @@ The source PNG files are verified and converted by
 `tools/convert_choice_assets.py`. Device firmware contains RGB565 arrays and
 does not require a PNG decoder, video decoder, SD card, or writable storage.
 
-## SID boundary
+## Living Canvas backend boundary
 
-`lc_sid_contract` maps the three Gemini S1 choices to the existing SID gateway
-contract on port 8090. It only prepares bounded `/v1/session`, `/v1/input`, and
+`lc_backend_contract` maps the three Gemini S1 choices to the independent
+Living Canvas decision backend. It only prepares bounded `/v1/session`, `/v1/input`, and
 `/v1/confirm` data. Live network transport remains disabled until Gemini S1
 Wi-Fi and gateway reachability are verified on hardware.
 

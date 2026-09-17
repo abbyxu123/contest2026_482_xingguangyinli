@@ -306,7 +306,7 @@ static void render_competition_state(void)
       case LC_COMPETITION_ERROR:
         set_competition_text("HANDOFF UNAVAILABLE",
                              g_competition.error[0] == '\0'
-                               ? "Check the SID gateway and retry"
+                               ? "Check the Living Canvas backend and retry"
                                : g_competition.error,
                              "SAFE STOP");
         break;
