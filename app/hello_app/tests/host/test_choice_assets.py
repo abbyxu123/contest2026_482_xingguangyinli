@@ -2,6 +2,7 @@
 
 import hashlib
 import importlib.util
+import os
 import tempfile
 from pathlib import Path
 
@@ -9,7 +10,9 @@ from PIL import Image
 
 
 APP_DIR = Path(__file__).resolve().parents[2]
-SOURCE_DIR = Path("/Users/beibeixv/Desktop")
+SOURCE_DIR = Path(
+    os.environ.get("LC_CHOICE_ASSET_SOURCE_DIR", APP_DIR / "assets" / "source")
+)
 CONVERTER_PATH = APP_DIR / "tools" / "convert_choice_assets.py"
 
 EXPECTED = {

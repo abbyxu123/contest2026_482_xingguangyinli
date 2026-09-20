@@ -8,7 +8,7 @@
 
 当前比赛 P0 只承诺一条可验收链路：画面中的比格犬协调“帮我点外卖”，美短猫读取口味记忆，用户在画框上二次确认后，用手机继续核对并付款。推荐、约束复核、确认与手机交接均由本仓库内独立的 Living Canvas Decision Backend 提供。鸽子、小猪和外星人分别保留给天气/提醒、食材/轻营养、探索/盲盒视角；它们是同一个主 Agent 的前台角色，不是五套各自持有权限的 Agent。
 
-> 状态更新：2026-09-15。完整 openvela 工作区已同步；未修改基线与 AI Agent + Living Canvas 产品配置均已在 Ubuntu ARM64 上构建成功。最新提交 `f84f15c` 增加了明确标记为离线预览的 LVGL 安全画面，构建日志确认显示模块参与编译，ELF 已链接 `living_canvas_main`、Agent 安全状态机与官方 VelaClaw 客户端桥接。九个严格主机测试通过，千问 `qwen3.8-max` 与小米 `mimo-v2.5` 均完成不含项目数据的最小连通验证。Gemini-S1 NAND/EMMC 候选整包已在隔离兼容层中生成并通过退出码、分区尺寸、功能标记、固件一致性和 NAND boot0 校验；尚未写入实体板。真机画面、Agent 板端运行时、音频播放、外设联动与首次刷机仍需逐项验证；本文不会把这些规划写成已实现结果。
+> 状态更新：2026-09-20。Gemini-S1/openvela 应用、状态机、安全桥接和独立决策后端已经形成可重复测试的工程版本；12 个严格 C 主机测试与 33 个后端自动化测试通过。Gemini-S1 应用分区已构建，并完成 128 MB NAND LiveSuit 整包封装；实体板当前处于硬件恢复通道与首次刷写联调阶段。为稳定呈现已实现的界面、触控和晚餐任务闭环，仓库同时收录通过 11 个 Python 自动化用例和 2 个原生测试程序的 ESP32-S3 竖屏演示版。ESP32-S3 是演示载体，不替代 Gemini-S1/openvela 正式技术路线。
 
 ## 一、作品简介
 
@@ -41,6 +41,7 @@ docs/                      环境、设备基线、恢复与构建门禁
 scripts/device/            只读 USB/ADB 身份与证据脚本
 tests/evidence/            脱敏的真实环境和设备证据
 logs/                      经人工审查后提交的赛事 AI Coding 日志
+demo/esp32s3_preview/      独立的 ESP32-S3 竖屏触控演示源码与测试
 ```
 
 赛事 manifest 将 `app/hello_app/` 映射到：
@@ -113,11 +114,21 @@ PYTHONPATH=backend/src python -m uvicorn living_canvas_backend.app:app \
 
 当前状态为 `FLASH_IMAGE_BUILT / BLOCKED_FOR_FIRST_FLASH_PROCEDURE`。候选整包已离线备份，但在取得 Gemini-S1 V1.1 对应的厂商/官方烧录步骤与恢复包、确认硬件版本和回滚流程之前，不执行首次刷机。
 
+### 5. ESP32-S3 竖屏演示
+
+演示源码位于 `demo/esp32s3_preview/`，面向 Waveshare ESP32-S3-Touch-AMOLED-1.8 V2（CO5300，368×448）。它复现触摸选择、外卖建议、盲盒和在家做饭三条流程，用于录制稳定的产品交互视频。运行其自动化测试：
+
+```bash
+bash demo/esp32s3_preview/tests/run_tests.sh
+```
+
+板卡依赖、构建、烧录和校验步骤见 `demo/esp32s3_preview/README.md` 与 `demo/esp32s3_preview/docs/FLASH_VERIFICATION.md`。
+
 ## 五、AI Coding 使用说明
 
 AI 协作目前用于需求拆解、风险边界、官方资料核对、测试先行实现、失败证据保留、隐私扫描和文档整理。每个核心模块先观察预期失败，再写最小实现，并同时运行严格编译警告与 sanitizer。
 
-赛事日志采集器尚未安装。完整 `.repo/` 工作区已经建立，但官方采集字段可能包含对话、思考、工具输入与输出，因此仍须先审阅全局安装影响，并使用一个新的项目专用会话验证。任何含密码、API Key、私人路径、个人文件或无关对话的会话都不得提交。详情见 `docs/LOGGING_SETUP.md`。
+赛事官方日志采集器已按队伍身份安装，模板自带的虚拟日志已移除。只有从 openvela 工作区内启动、由组委会工具自动采集并经人工审阅的真实会话才会进入 `logs/`。任何含密码、API Key、私人路径、个人文件或无关对话的会话都不得提交。详情见 `docs/LOGGING_SETUP.md`。
 
 ## 六、当前验证状态
 
@@ -125,7 +136,9 @@ AI 协作目前用于需求拆解、风险边界、官方资料核对、测试�
 | --- | --- | --- |
 | Gemini-S1 USB/ADB 身份 | 已验证（只读） | `tests/evidence/device/` |
 | Ubuntu 22.04 ARM64、4 核、8 GB | 已验证 | `tests/evidence/build/` |
-| 核心纯 C 逻辑 | 主机测试通过 | `app/hello_app/tests/host/` |
+| 核心纯 C 逻辑 | 12 个严格主机测试通过 | `app/hello_app/tests/host/` |
+| Living Canvas 决策后端 | 33 个 pytest 自动化测试通过 | `backend/tests/` |
+| ESP32-S3 触控演示 | 11 个 Python 用例及 2 个原生测试程序通过 | `demo/esp32s3_preview/tests/` |
 | openvela 全量同步与 ARM64/兼容主机工具 | 已验证 | `docs/ENVIRONMENT_SETUP.md` |
 | AI Agent + Living Canvas 固件构建 | 已通过（含 Agent 安全桥接） | `tests/evidence/build/gemini-s1-living-canvas-agent-20260915.txt` |
 | Gemini-S1 NAND/EMMC 候选整包 | 已生成并离线校验，未烧录 | `tests/evidence/build/gemini-s1-full-image-20260915.txt` |
@@ -133,7 +146,7 @@ AI 协作目前用于需求拆解、风险边界、官方资料核对、测试�
 | 千问 qwen3.8-max 最小连通 | 已验证（Mac、非敏感固定探针） | `tests/evidence/integration/qwen3.8-max-connectivity-20260915.txt` |
 | 小米 MiMo v2.5 最小连通 | 已验证（Mac、非敏感固定探针） | `tests/evidence/integration/mimo-v2.5-connectivity-20260915.txt` |
 | Gemini-S1 板载麦克风采集通路 | 已验证（仅非内容信号） | `tests/evidence/device/gemini-microphone-signal-20260914.txt` |
-| LVGL 真机画面、音频播放、ai_agent 板端运行时 | 未上板验证 | 后续真实证据 |
+| LVGL 真机画面、音频播放、ai_agent 板端运行时 | Gemini-S1 硬件恢复与首次刷写联调中 | 后续真实证据 |
 | 毫米波、MPR121、灯光、摄像头 | 未接入 | 外设保持断开 |
 | 未修改 Gemini-S1 基线构建 | 已通过 | `docs/BUILD_AND_FLASH.md` |
 | 首次刷机 | 阻塞 | `docs/BUILD_AND_FLASH.md`、`docs/RECOVERY.md` |
