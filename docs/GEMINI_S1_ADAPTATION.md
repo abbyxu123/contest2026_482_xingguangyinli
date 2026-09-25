@@ -19,10 +19,13 @@ Gemini-S1（Allwinner R528S3）是 Living Canvas 的正式目标主控，目标�
 | 设备基线 | USB/ADB 身份和板载麦克风非内容信号已验证 | `tests/evidence/device/` |
 | 恢复通道 | FEL 身份、R528/T113 芯片 ID、Winbond 256 MiB SPI NAND 已识别 | `tests/evidence/device/gemini-s1-fel-spinand-20260920.txt` |
 | 写入前保护 | 完整 SPI NAND 只读备份已生成并校验 | `tests/evidence/device/gemini-s1-fel-spinand-20260920.txt` |
+| macOS 部署复核 | Apple Silicon macOS 上完成镜像校验、结构检查、FEL 稳定性和 NAND 只读通路复核；受控写入在 NAND 操作前停止 | `tests/evidence/device/gemini-s1-macos-retest-20260925.txt` |
 
 ## 当前适配边界
 
 首次分区写入流程在 FES DRAM 初始化阶段超时，流程在进入存储、MBR 和分区写入阶段之前自动停止。停止后 FEL 芯片身份仍可读取，未发生持久化 NAND 写入。
+
+2026 年 9 月 25 日在 Apple Silicon macOS 上再次执行同范围验证，结果复现：镜像 SHA-256 与结构检查通过，FEL 与 SPI NAND 只读链路稳定；写入工具加载 FES 后连续 60 次未能完成 DRAM 就绪检查。操作前后的三个 NAND 采样点逐字节一致，因此该次测试仍不记为持久化写入或板端运行成功。
 
 因此，当前可以准确陈述：
 
