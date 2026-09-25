@@ -20,5 +20,8 @@ test = ["pytest>=7"]
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.setuptools.package-data]
+living_canvas_backend = ["catalog.json", "static/*.html"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
