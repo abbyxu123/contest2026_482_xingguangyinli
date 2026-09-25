@@ -170,3 +170,10 @@ complete a recoverable verified write, confirm openvela boot, and then verify
 LVGL, touch, audio, network, and ai_agent end to end. See
 `docs/GEMINI_S1_ADAPTATION.md`, `docs/RECOVERY.md`, and
 `tests/evidence/device/gemini-s1-fel-spinand-20260920.txt`.
+
+The same bounded operation was repeated on Apple Silicon macOS on 2026-09-25.
+Image integrity and structure, FEL enumeration, and SPI NAND reads passed. The
+operation again stopped after 60 failed FES DRAM readiness checks, before any
+storage-write stage. Three NAND samples were byte-identical before and after
+the attempt. The sanitized record is
+`tests/evidence/device/gemini-s1-macos-retest-20260925.txt`.
