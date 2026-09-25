@@ -42,7 +42,9 @@ Gemini-S1（Allwinner R528S3）是 Living Canvas 的正式目标主控，目标�
 - 模型输出到本地动作之间的白名单与二次校验；
 - 用户明确确认后的手机交接、灯光意图和可删除偏好记忆；
 - 网络、超时、取消、迟到回复和时钟未同步的确定性回退；
-- LVGL 状态、角色反馈、选择与二维码界面。
+- LVGL 状态、角色反馈、选择与二维码界面；
+- 按 ai_agent 官方 Markdown 格式编写、目标部署到
+  `/data/agent/skills/dinner-assistant.md` 的 Dinner Assistant Skill。
 
 板端验收只有在以下门禁全部通过后才会标记完成：
 

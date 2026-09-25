@@ -34,7 +34,7 @@
 | 赛题能力 | Living Canvas 的实现 |
 | --- | --- |
 | openvela + ai_agent | 团队 manifest 将应用映射进 openvela；官方 VelaClaw 客户端桥接只接收有界文本结果，设备动作仍由本地规则复核 |
-| 自定义 Skill | `app/hello_app/skills/dinner_assistant/SKILL.md` 定义输入、追问、候选数量、禁止编造和确认边界 |
+| 自定义 Skill | `app/hello_app/skills/dinner-assistant.md` 按 ai_agent 官方格式定义触发、步骤、候选数量和确认边界；目标部署到 `/data/agent/skills/dinner-assistant.md` |
 | 主动感知 | 存在事件触发 `IDLE → GREETING`，并用冷却逻辑避免重复打扰 |
 | 执行场景 | 只有用户明确确认后，系统才生成灯光意图、手机交接和可删除偏好记忆；模型不能直接执行付款或设备命令 |
 | 端云协同 | 设备端负责状态机、硬约束复核、确认和界面；独立后端负责候选、会话与手机交接；网络失败时走确定性回退 |
@@ -49,7 +49,7 @@
 app/hello_app/
   include/                 固定边界的核心接口
   src/                     纯 C 状态、时钟、晚餐、记忆、UI、语音与 Agent 安全桥接
-  skills/dinner_assistant/ 晚餐运行时合同
+  skills/                  可部署到 ai_agent 的 Dinner Assistant Skill
   tests/host/              可在 Mac/Linux 重复运行的主机测试
 docs/                      环境、设备基线、Gemini-S1 适配、恢复与构建门禁
 scripts/device/            只读 USB/ADB 身份与证据脚本
@@ -125,6 +125,7 @@ PYTHONPATH=backend/src python -m uvicorn living_canvas_backend.app:app \
 - `docs/BUILD_AND_FLASH.md`
 - `docs/DEVICE_BASELINE.md`
 - `docs/GEMINI_S1_ADAPTATION.md`
+- `docs/SKILL_DEMO.md`
 - `docs/RECOVERY.md`
 
 当前状态为 `TARGET_BUILD_PASSED / PLATFORM_DEPLOYMENT_IN_ADAPTATION`。首次受控写入在 FES DRAM 初始化阶段停止，未进入持久化 NAND 写入；后续按板卡版本、恢复、写入、启动、显示、音频、网络和 ai_agent 门禁逐项验证。
