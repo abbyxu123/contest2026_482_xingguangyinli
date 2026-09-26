@@ -1,0 +1,104 @@
+Gemini-S1 SPI display and Living Canvas runtime validation record
+Date: 2026-09-27 (Asia/Shanghai)
+Target: Gemini-S1 / Allwinner R528S3 / openvela / ILI9341 SPI LCD
+Result: SPI_DISPLAY_VERIFIED / TOUCH_EVENT_VERIFIED / LIVING_CANVAS_ON_PANEL_VERIFIED
+
+Purpose
+-------
+This record captures sanitized device-side evidence from the Gemini-S1 target.
+It contains no credentials, network configuration, model tokens, private host
+paths, raw UART logs, or user content.
+
+Display-path finding and correction
+-----------------------------------
+The board configuration enabled both the R528 DISP2 framebuffer provider and
+the NuttX LCD framebuffer while the Gemini-S1 panel is connected through the
+ILI9341 hardware-SPI path. Link inspection showed that the DISP2 provider won
+the framebuffer symbols, although the panel's parallel TCON data pins are not
+used by this board configuration.
+
+The verified integration candidate therefore:
+
+1. excludes DISP2 dev_fb.c when CONFIG_LCD_ILI9341_HARDWARE_SPI is enabled;
+2. lets the generic NuttX lcd_framebuffer provide /dev/fb0;
+3. uses board_lcd_initialize/board_lcd_getdev from ili9341_lcd_spi.c;
+4. adds the required board_lcd_uninitialize entry point and negative errno;
+5. leaves the Living Canvas application, touch driver, resource partition and
+   NAND layout unchanged.
+
+Build and link verification
+---------------------------
+- Product build exit status: 0.
+- CONFIG_LCD_ILI9341_HARDWARE_SPI=y.
+- CONFIG_LCD_FRAMEBUFFER=y.
+- CONFIG_LCD_EXTERNINIT is not set.
+- up_fbinitialize/up_fbgetvplane/up_fbuninitialize provider:
+  lcd_framebuffer.o.
+- board_lcd_initialize/board_lcd_getdev/board_lcd_uninitialize provider:
+  ili9341_lcd_spi.o.
+- living_canvas_main remained linked in the target ELF.
+
+Flashed artifacts
+-----------------
+- Complete IMAGEWTY NAND image size: 28,124,160 bytes.
+- Complete image SHA-256:
+  189f761342485eb83d6eb321b43fab44c0bc7b10c03166035b6514df52498642
+- openvela application image (nsh.fex) SHA-256:
+  650e338ee393356dca401c5f79c5b230ba5697caa61035c34b06a09d9eb0c98c
+- Linked ELF SHA-256:
+  afec570888621d5b92121c7ac4a40fbec4b8c97812a1155b1f38794c2cfad1a0
+- The unpacked nsh.fex and bootloader partition were byte-identical to the
+  newly built nsh.fex.
+- The image parser reported IMAGEWTY version 0x00000300, 22 embedded files and
+  the expected 10-partition Gemini-S1 NAND layout.
+
+Flash verification
+------------------
+The complete image was written through FEL using full erase, per-stage verify
+and automatic reboot. The following stages all verified successfully:
+
+- MBR;
+- bootloader application partition;
+- resource partition;
+- userdata partition;
+- Boot1;
+- Boot0.
+
+The programmer ended with "All partitions flashed successfully", and the
+board rebooted from NAND to the openvela NSH prompt.
+
+Runtime observations
+--------------------
+- /dev/fb0 opened successfully through the NuttX LCD framebuffer.
+- Pixel format: 11 (RGB565), 320 x 240, 16 bpp.
+- Framebuffer length: 153,600 bytes; stride: 640 bytes.
+- /dev/input0 opened successfully; maximum touch points: 1.
+- The upstream LVGL widgets screen visibly replaced the former panel
+  initialization pattern.
+- A touch event visibly opened the widgets date selector, confirming an
+  end-to-end panel refresh plus touch-input event on the physical board.
+- After a clean reboot, Living Canvas opened the same framebuffer and input
+  device and visibly rendered its artwork, decision overlay and QR component
+  on the Gemini-S1 panel.
+- The Living Canvas competition state continued cycling while the UART record
+  contained no new data abort, assertion or panic during the observation
+  window.
+
+Current product-calibration boundary
+------------------------------------
+This run verifies the hardware-SPI display path and the Living Canvas on-panel
+runtime. The tested configuration is landscape (320 x 240). The final product
+layout is portrait (240 x 320), so panel orientation and matching touch
+coordinates remain a separate calibration gate.
+
+The QR component rendered correctly, but the URL supplied for this engineering
+run was not a public product handoff endpoint. It is not represented as a
+completed mobile order flow. Final evidence must use a publicly reachable URL
+whose on-screen description matches its actual destination.
+
+Privacy and evidence handling
+-----------------------------
+- Raw UART output is not committed because it contains unrelated network
+  initialization data.
+- The engineering photo containing the non-final QR URL is not committed.
+- No ESP32 result is used as Gemini-S1/openvela runtime evidence.

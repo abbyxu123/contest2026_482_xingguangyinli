@@ -8,7 +8,7 @@
 
 当前比赛 P0 只承诺一条可验收链路：画面中的比格犬协调“帮我点外卖”，美短猫读取口味记忆，用户在画框上二次确认后，用手机继续核对并付款。推荐、约束复核、确认与手机交接均由本仓库内独立的 Living Canvas Decision Backend 提供。鸽子、小猪和外星人分别保留给天气/提醒、食材/轻营养、探索/盲盒视角；它们是同一个主 Agent 的前台角色，不是五套各自持有权限的 Agent。
 
-> 状态更新：2026-09-26。Gemini-S1/openvela 应用、状态机、ai_agent 安全桥接、自定义 Skill、LVGL 界面和独立决策后端已经形成可重复测试的工程版本；12 个严格 C 主机测试与 34 个后端自动化测试通过。128 MB NAND 整包已在 Gemini-S1 真机完成全擦写、逐阶段校验和自动重启，openvela 已从 NAND 启动到 NSH。LVGL 帧缓冲与触摸设备已经真机打开并留下脱敏证据；实体屏的 ILI9341 CPU/TCON 帧传输和横屏旋转交接继续适配。详见 `docs/GEMINI_S1_ADAPTATION.md`。
+> 状态更新：2026-09-27。Gemini-S1/openvela 应用、状态机、ai_agent 安全桥接、自定义 Skill、LVGL 界面和独立决策后端已经形成可重复测试的工程版本；12 个严格 C 主机测试与 34 个后端自动化测试通过。完整 NAND 镜像已在 Gemini-S1 真机完成全擦写、逐阶段校验和自动重启，openvela 已从 NAND 启动到 NSH。SPI LCD framebuffer、官方 LVGL widgets、触摸事件和 Living Canvas 作品界面均已在实体板验证；最终竖屏与触摸坐标继续校准。详见 `docs/GEMINI_S1_ADAPTATION.md`。
 
 ## 一、作品简介
 
@@ -119,7 +119,7 @@ PYTHONPATH=backend/src python -m uvicorn living_canvas_backend.app:app \
 
 ### 4. openvela 构建与 Gemini-S1 适配
 
-官方未修改基线以及 AI Agent + Living Canvas 产品固件均已构建成功；最新目标源码包含受限录音会话、Agent 安全状态机、官方 VelaClaw 桥接、`--agent-prompt` 受限入口，以及 `living_canvas --ui-preview` 离线安全预览。预览模式不连接模型、不采集音视频、不触发设备动作。实体板已经完成 USB/ADB、麦克风、FEL、SPI NAND、完整写入和 NAND 启动验证；显示交接及后续运行时链路继续适配。准确状态见：
+官方未修改基线以及 AI Agent + Living Canvas 产品固件均已构建成功；最新目标源码包含受限录音会话、Agent 安全状态机、官方 VelaClaw 桥接、`--agent-prompt` 受限入口，以及 `living_canvas --ui-preview` 离线安全预览。预览模式不连接模型、不采集音视频、不触发设备动作。实体板已经完成 USB/ADB、麦克风、FEL、SPI NAND、完整写入、NAND 启动、SPI 显示、触摸事件和 Living Canvas 作品界面验证。准确状态见：
 
 - `docs/ENVIRONMENT_SETUP.md`
 - `docs/BUILD_AND_FLASH.md`
@@ -128,7 +128,7 @@ PYTHONPATH=backend/src python -m uvicorn living_canvas_backend.app:app \
 - `docs/SKILL_DEMO.md`
 - `docs/RECOVERY.md`
 
-当前状态为 `FULL_FLASH_VERIFIED / OPENVELA_BOOT_VERIFIED / DISPLAY_HANDOFF_IN_ADAPTATION`。最新真机验证已完成完整 NAND 写入与校验并从 NAND 启动；LVGL 已打开帧缓冲和触摸设备，剩余显示项收敛到 ILI9341 CPU/TCON 帧传输及 240x320→320x240 旋转交接。后续继续按显示、音频、网络和 ai_agent 门禁逐项验证。
+当前状态为 `FULL_FLASH_VERIFIED / OPENVELA_BOOT_VERIFIED / SPI_DISPLAY_VERIFIED / LIVING_CANVAS_ON_PANEL_VERIFIED`。最新真机验证已完成完整 NAND 写入与校验并从 NAND 启动；SPI LCD framebuffer、LVGL、触摸事件和作品循环界面已验证。后续继续完成 240×320 竖屏与触摸坐标校准，并按音频、网络和 ai_agent 门禁逐项验证。
 
 ### 5. 辅助交互原型（非 openvela 运行证据）
 
@@ -159,12 +159,12 @@ AI 协作目前用于需求拆解、风险边界、官方资料核对、测试�
 | AI Agent + Living Canvas 固件构建 | 已通过（含 Agent 安全桥接） | `tests/evidence/build/gemini-s1-living-canvas-agent-20260915.txt` |
 | 当前产品源码目标构建 | 已通过（12 项主机门禁、目标链接和整包校验） | `tests/evidence/build/gemini-s1-product-20260918.txt` |
 | Gemini-S1 NAND 整包 | 已生成、离线校验，并于 2026-09-26 完成真机全量烧录与逐阶段校验 | `tests/evidence/device/gemini-s1-full-flash-runtime-20260926.txt` |
-| Gemini-S1 LVGL 离线安全预览 | 已构建并封装，未上板验证 | `tests/evidence/build/gemini-s1-ui-preview-20260915.txt` |
+| Gemini-S1 LVGL / Living Canvas 实体屏 | SPI LCD framebuffer、官方 widgets、触摸事件与作品循环界面均已验证；最终竖屏继续校准 | `tests/evidence/device/gemini-s1-spi-display-runtime-20260927.txt` |
 | 千问 qwen3.8-max 最小连通 | 已验证（Mac、非敏感固定探针） | `tests/evidence/integration/qwen3.8-max-connectivity-20260915.txt` |
 | 小米 MiMo v2.5 最小连通 | 已验证（Mac、非敏感固定探针） | `tests/evidence/integration/mimo-v2.5-connectivity-20260915.txt` |
 | Gemini-S1 板载麦克风采集通路 | 已验证（仅非内容信号） | `tests/evidence/device/gemini-microphone-signal-20260914.txt` |
 | Gemini-S1 FEL 与 SPI NAND | 芯片、256 MiB NAND、写入前只读备份已验证 | `tests/evidence/device/gemini-s1-fel-spinand-20260920.txt` |
-| LVGL 真机运行时 | `/dev/fb0`、`/dev/input0` 已打开，像素已写入帧缓冲；ILI9341 面板刷新交接继续适配 | `tests/evidence/device/gemini-s1-full-flash-runtime-20260926.txt` |
+| LVGL 真机运行时 | RGB565 `/dev/fb0`、`/dev/input0`、实体屏刷新和触摸事件已验证 | `tests/evidence/device/gemini-s1-spi-display-runtime-20260927.txt` |
 | 音频播放、网络、ai_agent 板端运行时 | 继续按独立门禁验证 | `docs/GEMINI_S1_ADAPTATION.md` |
 | 毫米波、MPR121、灯光、摄像头 | 未接入 | 外设保持断开 |
 | 未修改 Gemini-S1 基线构建 | 已通过 | `docs/BUILD_AND_FLASH.md` |
