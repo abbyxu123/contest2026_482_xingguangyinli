@@ -1,0 +1,83 @@
+Gemini-S1 full-flash and runtime validation record
+Date: 2026-09-26 (Asia/Shanghai)
+Target: Gemini-S1 / Allwinner R528S3 / openvela
+Result: FULL_FLASH_VERIFIED / OPENVELA_BOOT_VERIFIED / DISPLAY_HANDOFF_IN_ADAPTATION
+
+Purpose
+-------
+This record captures sanitized, reproducible device-side evidence from the
+Gemini-S1 target. It contains no account credentials, Wi-Fi configuration,
+model tokens, private paths, or user content.
+
+Verified deployment path
+------------------------
+1. The board was identified in FEL mode as Allwinner R528/T113.
+2. The complete 128 MiB NAND factory-layout image was written with full erase,
+   per-stage verification, and automatic reboot.
+3. MBR, bootloader, resource, userdata, Boot1, and Boot0 stages all completed
+   successfully. The programmer ended with "All partitions flashed
+   successfully".
+4. The board rebooted from NAND and reached the openvela NSH prompt over UART2
+   at 1,500,000 baud.
+
+Flashed artifact
+----------------
+- Image SHA-256:
+  761634ae6f9635615ce3fb3fe1547ef5052c3adf07ee5987b0e7835898e2df61
+- openvela application image (nsh.fex) SHA-256:
+  421276c38c30a7eef45ea7f1dacbe97a23539bb213363ab94d8ac575f1dfa383
+- Linked ELF SHA-256:
+  93cf27e69cccd7901296335093df6877a8470831ffd614e83946d4df49719fd2
+- Linked application symbol: living_canvas_main
+- Linker SDRAM use: 13,009,968 bytes (1.35%)
+
+Verified runtime observations
+-----------------------------
+- openvela reached an interactive NSH prompt after the verified NAND flash.
+- LVGL opened /dev/fb0 successfully.
+- Reported framebuffer format: 32-bit, 320 x 240, stride 1280 bytes.
+- Reported framebuffer address: 0x46e00000; length: 307200 bytes.
+- LVGL opened /dev/input0 successfully; reported maximum touch points: 1.
+- The standard LVGL widgets task remained active without the earlier
+  framebuffer-update data abort after the optional-rotation null guard.
+- A direct memory read confirmed that LVGL-generated pixel values were present
+  in the framebuffer.
+- The built-in display status command reported an active LCD manager with no
+  manager error, 240 x 320 panel timing, and the enabled UI layer at
+  0x46e00000.
+
+Representative sanitized status
+-------------------------------
+screen 0:
+  manager: 240 x 320, LCD output, error count 0
+  UI layer: enabled, channel 1, layer 0
+  framebuffer: 320 x 240, address 0x46e00000
+  LVGL: /dev/fb0 open success
+  input: /dev/input0 open success, maxpoint 1
+
+Display adaptation finding
+--------------------------
+The current panel remains on its initialization pattern while LVGL writes new
+pixels to the active framebuffer. The built-in display-engine color-bar test
+also leaves the panel image unchanged. Source and runtime inspection narrowed
+the remaining integration item to the ILI9341 CPU/TCON transfer and landscape
+rotation handoff:
+
+- physical panel timing is 240 x 320;
+- the Living Canvas/LVGL surface is 320 x 240;
+- the optional G2D rotation path was enabled at compile time but its runtime
+  rotation properties were absent, which previously produced a null rotation
+  context during framebuffer update;
+- the application framebuffer, touch input, display manager, full-image flash,
+  and openvela boot path are independently operational.
+
+This boundary is retained as an explicit adaptation item. It is not represented
+as a completed on-panel Living Canvas demonstration.
+
+Reproducibility and privacy
+---------------------------
+- Artifact hashes above identify the exact tested build.
+- Raw UART output is not committed because it also contains unrelated network
+  initialization data. Only the minimal device facts needed for review are
+  retained here.
+- No ESP32 result is used as Gemini-S1/openvela runtime evidence.

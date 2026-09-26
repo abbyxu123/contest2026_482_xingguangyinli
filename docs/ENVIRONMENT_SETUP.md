@@ -81,7 +81,9 @@ The downloaded `zlib1g_1.2.11.dfsg-2ubuntu9.2_amd64.deb` was obtained from Ubunt
 - Read-only USB/ADB identity checks: **passed**
 - First flash: **blocked pending recovery prerequisites**
 
-Status: `READY_FOR_DEVELOPMENT / BLOCKED_FOR_FLASH`
+Historical setup status: `READY_FOR_DEVELOPMENT / BLOCKED_FOR_FLASH`.
+The current deployment status is maintained in `docs/BUILD_AND_FLASH.md` and
+`docs/GEMINI_S1_ADAPTATION.md`.
 
 See `docs/BUILD_AND_FLASH.md` for the exact build evidence and `docs/RECOVERY.md` for the remaining irreversible-operation gate.
 
