@@ -1,6 +1,6 @@
 # Gemini-S1 / openvela 适配状态
 
-最后核验：2026-09-25（Asia/Shanghai）
+最后核验：2026-09-26（Asia/Shanghai）
 
 ## 平台定位
 
@@ -20,8 +20,25 @@ Gemini-S1（Allwinner R528S3）是 Living Canvas 的正式目标主控，目标�
 | 恢复通道 | FEL 身份、R528/T113 芯片 ID、Winbond 256 MiB SPI NAND 已识别 | `tests/evidence/device/gemini-s1-fel-spinand-20260920.txt` |
 | 写入前保护 | 完整 SPI NAND 只读备份已生成并校验 | `tests/evidence/device/gemini-s1-fel-spinand-20260920.txt` |
 | macOS 部署复核 | Apple Silicon macOS 上完成镜像校验、结构检查、FEL 稳定性和 NAND 只读通路复核；FES DRAM 初始化已通过，U-Boot/FES 重枚举仍待完成 | `tests/evidence/device/gemini-s1-macos-retest-20260925.txt`、`tests/evidence/device/gemini-s1-fes-uboot-progress-20260925.txt` |
+| 完整 NAND 烧录 | 128 MiB 整包完成全擦写、分阶段校验、Boot0/Boot1 写入与自动重启 | `tests/evidence/device/gemini-s1-full-flash-runtime-20260926.txt` |
+| openvela 真机启动 | 烧录后从 NAND 启动并进入 UART2 NSH；目标符号 `living_canvas_main` 已链接 | `tests/evidence/device/gemini-s1-full-flash-runtime-20260926.txt` |
+| LVGL 与输入设备 | `/dev/fb0`、`/dev/input0` 打开成功，标准 LVGL 任务稳定运行，帧缓冲确认存在新像素 | `tests/evidence/device/gemini-s1-full-flash-runtime-20260926.txt` |
+| 实体屏交接 | 已收敛至 ILI9341 CPU/TCON 传输和 240x320→320x240 旋转配置，继续适配 | `tests/evidence/device/gemini-s1-full-flash-runtime-20260926.txt` |
 
-## 当前适配边界
+## 2026-09-26 真机推进
+
+Gemini-S1 已完成完整 NAND 烧录与校验，并在自动重启后从 NAND 进入
+openvela NSH。LVGL 成功打开 320x240、32 位的 `/dev/fb0`，触摸驱动成功
+打开 `/dev/input0`；标准 LVGL 任务在修正可选旋转空指针后保持运行，且
+帧缓冲内可读取到由 LVGL 写入的新像素。
+
+实体屏当前仍显示面板初始化图案。显示管理器报告物理时序为 240x320，
+应用表面为 320x240；内置显示引擎彩条测试也没有改变面板画面。剩余工作
+因此已收敛到 ILI9341 CPU/TCON 帧传输和横屏旋转交接，而不是镜像写入、
+openvela 启动、应用链接或 LVGL/触摸设备初始化。完整脱敏记录见
+`tests/evidence/device/gemini-s1-full-flash-runtime-20260926.txt`。
+
+## 历史适配边界（2026-09-25）
 
 首次分区写入流程曾在 FES DRAM 初始化阶段超时，流程在进入存储、MBR 和分区写入阶段之前自动停止。停止后 FEL 芯片身份仍可读取，未发生持久化 NAND 写入。
 
@@ -29,14 +46,14 @@ Gemini-S1（Allwinner R528S3）是 Living Canvas 的正式目标主控，目标�
 
 同日重新枚举 USB 后继续执行受控验证，FES DRAM 初始化连续两次在首次状态读取时通过，返回 `0x4d415244`（`DRAM`）成功标志和参数更新标志。随后 U-Boot、DTB 占位项与系统配置完成内存传输，U-Boot 执行请求成功；设备离开 FEL，但在 45 秒门限内没有枚举成 FES/SRV 设备。工具侧同时补充了 FES 返回参数向 U-Boot 的传递及回归测试；完整可执行测试集 197 项通过。应用该修正后的实板结果仍停在 FES 重枚举门禁，因此没有进入存储查询、MBR、擦除或分区下载阶段。
 
-因此，当前可以准确陈述：
+截至 2026-09-25 可以准确陈述：
 
 - Living Canvas 的 Gemini-S1/openvela 目标源码、主机逻辑、目标构建和镜像封装已经完成并留下证据；
 - Gemini-S1 的 USB/ADB、麦克风、FEL 和 SPI NAND 基线已经实板验证；
-- Gemini-S1 的首次持久化写入、启动以及 LVGL、音频、网络、ai_agent 的板端端到端链路仍在适配验证中；
+- Gemini-S1 的首次持久化写入和启动当时仍在适配验证中；该门禁已由 2026-09-26 的完整烧录与启动证据更新；
 - 当前不把尚未完成的板端运行描述为已完成，也不把其他主控的演示结果替代为 openvela 运行结果。
 
-当前首次刷写问题已经从 DRAM 初始化收敛到 U-Boot/FES 启动与 USB 重枚举链路。处理方式仍是保留原始存储备份、限制首次写入范围、核对烧录专用 U-Boot、板卡版本和恢复路径，并在每个阶段生成可回溯证据。
+该阶段的问题曾从 DRAM 初始化收敛到 U-Boot/FES 启动与 USB 重枚举链路。2026-09-26 已通过完整烧录、校验和 NAND 启动越过此门禁；历史记录继续保留用于复核。
 
 ## 代码完成度与运行门禁
 

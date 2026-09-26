@@ -1,12 +1,16 @@
 # Gemini-S1 Recovery and Flash Gate
 
-Last reviewed: 2026-09-14 (Asia/Shanghai)
+Last reviewed: 2026-09-26 (Asia/Shanghai)
 
 ## Current decision
 
-`BLOCKED_FOR_FLASH`
+`FULL_FLASH_VERIFIED / RECOVERY_EVIDENCE_RETAINED`
 
-Do not flash, erase, repartition, boot an alternate image, enter an undocumented recovery mode, or run a vendor programming tool against Gemini-S1 serial `1234`.
+The original conservative pre-flash gate below is retained as historical safety
+context. On 2026-09-26 the board completed a verified full-image flash and
+rebooted from NAND into openvela NSH. Exact artifact hashes and sanitized stage
+results are recorded in
+`tests/evidence/device/gemini-s1-full-flash-runtime-20260926.txt`.
 
 ## What is verified
 
@@ -19,7 +23,7 @@ Do not flash, erase, repartition, boot an alternate image, enter an undocumented
 - `/proc/partitions` and `/dev` expose NAND devices; `/data` is YAFFS while `/etc` and `/resource` are ROMFS.
 - The factory runtime provides ADB shell and audio nodes `pcm0c`/`pcm0p`, but no `vapp`, `ai_agent`, or `living_canvas` built-in.
 - Its `exec` command accepts a memory address rather than an ELF path, so ADB file transfer alone is not a verified native-app deployment path.
-- The AI Agent + Living Canvas product image built successfully and is backed up with SHA-256 evidence; it has not been written to the board.
+- The AI Agent + Living Canvas product image built successfully and is backed up with SHA-256 evidence. A later tested image completed verified full-device programming on 2026-09-26; see the current decision above.
 
 ## Public recovery-source audit
 
@@ -28,7 +32,7 @@ Do not flash, erase, repartition, boot an alternate image, enter an undocumented
 - The public tree contains `lichee/board/r528s3/gemini-s1_nand/configs/`; read-only runtime evidence confirms NAND, but does not prove that every partition offset and boot component matches the shipped `ASX4B` firmware.
 - The vendor README delegates complete packing and deployment instructions to board/vendor documentation. The linked vendor wiki was not readable in this environment, so its contents are not treated as verified.
 
-## Missing recovery prerequisites
+## Historical pre-flash prerequisites
 
 - Factory image or board-matched recovery package: **not acquired**.
 - SHA-256 and provenance for a recovery package: **unknown**.
@@ -41,7 +45,7 @@ Do not flash, erase, repartition, boot an alternate image, enter an undocumented
 
 Use `docs/VENDOR_RECOVERY_QUESTIONS.md` as the minimum support request; include the observed `ASX4B / 1.51.32 / NAND / slot A` facts, and do not replace missing technical answers with assumptions. The read-only capture is in `tests/evidence/device/gemini-runtime-baseline-20260914.txt`.
 
-## Flash authorization gate
+## Historical first-flash authorization gate
 
 First flash is allowed only after all of the following are true:
 

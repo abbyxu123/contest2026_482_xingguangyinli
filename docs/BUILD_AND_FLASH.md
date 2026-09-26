@@ -1,8 +1,8 @@
 # Gemini-S1 Build and Flash Baseline
 
-Last verified: 2026-09-25 (Asia/Shanghai)
+Last verified: 2026-09-26 (Asia/Shanghai)
 
-Current status: `TARGET_BUILD_PASSED / PLATFORM_DEPLOYMENT_IN_ADAPTATION`.
+Current status: `FULL_FLASH_VERIFIED / OPENVELA_BOOT_VERIFIED / DISPLAY_HANDOFF_IN_ADAPTATION`.
 Sections below preserve dated build evidence. The latest hardware boundary is
 recorded in `docs/GEMINI_S1_ADAPTATION.md` and supersedes earlier first-flash
 planning statements where they differ.
@@ -77,7 +77,8 @@ Verified outputs:
 
 ## AI Agent + Living Canvas product result
 
-Status: `PRODUCT_BUILD_PASSED / NOT_FLASHED`
+Historical status on 2026-09-14: `PRODUCT_BUILD_PASSED / NOT_FLASHED`.
+The latest deployment status is recorded at the top of this document.
 
 The official Gemini-S1 AI Agent configuration and compatibility patches were applied on local, reversible branches. The team application added only `CONFIG_LVX_USE_DEMO_CONTEST2026_482_LIVING_CANVAS=y` to that board configuration before rebuilding.
 
@@ -155,6 +156,20 @@ To avoid adding the `amd64` architecture or changing APT sources, Ubuntu Jammy's
 The successful build contains upstream LTO/type and NAND `memcpy` warnings plus an empty-loadable-segment warning from strip. They did not produce a nonzero exit or prevent image generation. They remain recorded for later upstream review and must not be rewritten as errors or silently removed from evidence.
 
 ## Current deployment gate
+
+### 2026-09-26 full-image result
+
+Status: `FULL_FLASH_VERIFIED / OPENVELA_BOOT_VERIFIED`
+
+The 128 MiB factory-layout image completed full erase, MBR and partition
+programming, Boot0/Boot1 programming, verification, and automatic reboot on the
+physical Gemini-S1. The board then booted from NAND to the openvela NSH prompt.
+LVGL opened `/dev/fb0`, the touch stack opened `/dev/input0`, and generated
+pixels were confirmed in framebuffer memory. The remaining display acceptance
+item is the ILI9341 CPU/TCON transfer and landscape-rotation handoff. See
+`tests/evidence/device/gemini-s1-full-flash-runtime-20260926.txt`.
+
+### Earlier controlled-deployment history
 
 Status: `PLATFORM_DEPLOYMENT_IN_ADAPTATION`
 
