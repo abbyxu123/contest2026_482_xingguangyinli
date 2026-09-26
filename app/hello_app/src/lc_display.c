@@ -95,6 +95,7 @@ static unsigned int g_competition_step;
 static char g_competition_handoff[LC_COMPETITION_QR_URL_MAX];
 static char g_competition_detail_text[LC_COMPETITION_REASON_MAX +
                                       LC_COMPETITION_PRICE_MAX + 4u];
+static bool g_project_demo;
 
 static void init_image_descriptor(lv_image_dsc_t *descriptor,
                                   const uint8_t *data,
@@ -272,9 +273,18 @@ static void render_competition_state(void)
         break;
 
       case LC_COMPETITION_CONFIRMING:
-        set_competition_text("CONFIRMED ON FRAME",
-                             "Preparing a phone handoff...",
-                             "PAYMENT STAYS ON PHONE");
+        if (g_project_demo)
+          {
+            set_competition_text("DEMO COMPLETE",
+                                 "Preparing public project details...",
+                                 "PUBLIC PROJECT LINK");
+          }
+        else
+          {
+            set_competition_text("CONFIRMED ON FRAME",
+                                 "Preparing a phone handoff...",
+                                 "PAYMENT STAYS ON PHONE");
+          }
         break;
 
       case LC_COMPETITION_QR:
@@ -294,8 +304,17 @@ static void render_competition_state(void)
           }
 
         lv_obj_remove_flag(g_competition_qr, LV_OBJ_FLAG_HIDDEN);
-        set_competition_text("SCAN ON PHONE", "Review the order there",
-                             "PAYMENT STAYS ON PHONE");
+        if (g_project_demo)
+          {
+            set_competition_text("VIEW PROJECT ON PHONE",
+                                 "Open the public project page",
+                                 "PUBLIC PROJECT LINK");
+          }
+        else
+          {
+            set_competition_text("SCAN ON PHONE", "Review the order there",
+                                 "PAYMENT STAYS ON PHONE");
+          }
 #  else
         lc_competition_fail(&g_competition, "QR module is disabled");
         set_competition_text("HANDOFF UNAVAILABLE", g_competition.error,
@@ -358,12 +377,14 @@ static void advance_competition_demo(lv_timer_t *timer)
 }
 
 static void create_competition_overlay(lv_obj_t *screen,
-                                       const char *handoff_url)
+                                       const char *handoff_url,
+                                       bool project_demo)
 {
   size_t length = strlen(handoff_url);
 
   lc_competition_init(&g_competition);
   g_competition_step = 0u;
+  g_project_demo = project_demo;
   memcpy(g_competition_handoff, handoff_url, length + 1u);
 
   g_competition_panel = lv_obj_create(screen);
@@ -524,7 +545,7 @@ int lc_display_run_choice_preview(void)
   return run_artwork_preview(true);
 }
 
-int lc_display_run_competition_demo(const char *qr_url)
+static int run_link_demo(const char *qr_url, bool project_demo)
 {
   lv_nuttx_dsc_t info;
   lv_nuttx_result_t result;
@@ -535,14 +556,14 @@ int lc_display_run_competition_demo(const char *qr_url)
       (strncmp(qr_url, "http://", 7u) != 0 &&
        strncmp(qr_url, "https://", 8u) != 0))
     {
-      fprintf(stderr, "Living Canvas requires an HTTP handoff URL\n");
+      fprintf(stderr, "Living Canvas requires an HTTP link URL\n");
       return 2;
     }
 
   length = strlen(qr_url);
   if (length == 0u || length >= sizeof(g_competition_handoff))
     {
-      fprintf(stderr, "Living Canvas handoff URL is too long\n");
+      fprintf(stderr, "Living Canvas link URL is too long\n");
       return 2;
     }
 
@@ -579,7 +600,7 @@ int lc_display_run_competition_demo(const char *qr_url)
     }
 
   create_choice_overlay(screen);
-  create_competition_overlay(screen, qr_url);
+  create_competition_overlay(screen, qr_url, project_demo);
 
   for (;;)
     {
@@ -596,6 +617,16 @@ int lc_display_run_competition_demo(const char *qr_url)
 
       usleep(idle * 1000u);
     }
+}
+
+int lc_display_run_competition_demo(const char *qr_url)
+{
+  return run_link_demo(qr_url, false);
+}
+
+int lc_display_run_project_demo(const char *project_url)
+{
+  return run_link_demo(project_url, true);
 }
 
 #else
@@ -618,6 +649,12 @@ int lc_display_run_choice_preview(void)
 int lc_display_run_competition_demo(const char *qr_url)
 {
   (void)qr_url;
+  return 2;
+}
+
+int lc_display_run_project_demo(const char *project_url)
+{
+  (void)project_url;
   return 2;
 }
 

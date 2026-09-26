@@ -12,12 +12,19 @@ failure cannot take over startup or hide the recovery channel.
 living_canvas --ui-preview
 living_canvas --image-preview
 living_canvas --choice-preview
+living_canvas --competition-demo <authorized-handoff-url>
+living_canvas --project-demo https://github.com/open-vela/contest2026_482_xingguangyinli
 ```
 
 - `--ui-preview` is the original text-only display diagnostic.
 - `--image-preview` shows the approved full-screen artwork without controls.
 - `--choice-preview` shows the artwork plus takeout, mystery-box, and eat-at-home
   cards. Takeout is highlighted by default.
+- `--competition-demo` exercises the explicit confirmation and phone-handoff
+  UI with an authorized order-review URL. It never submits payment.
+- `--project-demo` exercises the same bounded UI states but labels the QR code
+  as a public project link. It is intended for an offline exhibition loop and
+  must not be presented as an order or payment handoff.
 
 The source PNG files are verified and converted by
 `tools/convert_choice_assets.py`. Device firmware contains RGB565 arrays and

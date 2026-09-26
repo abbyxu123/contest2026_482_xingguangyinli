@@ -1,0 +1,64 @@
+Living Canvas / Gemini-S1 portrait project-demo candidate
+Date: 2026-09-27 (Asia/Shanghai)
+Status: BUILD_PACK_INSPECT_PASS / DEVICE_FLASH_PENDING
+
+Target
+- Board: Gemini-S1 (Allwinner R528S3)
+- openvela configuration: r528s3-gemini-s1/configs/nsh_minidisplay
+- Application command:
+  living_canvas --project-demo https://github.com/open-vela/contest2026_482_xingguangyinli
+- Display candidate: ILI9341 hardware SPI, RGB565, 240x320 portrait
+- Vendor base used for patch validation: a502daad
+
+Host and build result
+- Build host: Ubuntu 22.04, ARM64
+- Full target build completed successfully.
+- Application host gate: 12 strict C tests passed.
+- Linked SDRAM usage: 12,884,632 / 961,943,040 bytes (1.34%).
+- The board post-build step uses $(CROSSDEV)strip and $(OBJCOPY), avoiding a
+  host-specific linux-x86_64 tool path on ARM64 builders.
+- The linked ELF and packed application contain --project-demo,
+  VIEW PROJECT ON PHONE, and PUBLIC PROJECT LINK.
+
+Reproduction gates
+- Host tests:
+  make -C app/hello_app/tests/host clean test
+- Patch regression:
+  python3 tests/test_gemini_s1_spi_lcd_framebuffer.py \
+    patches/gemini-s1-spi-lcd-framebuffer.patch
+- Vendor patch applicability:
+  git apply --check --cached \
+    patches/gemini-s1-spi-lcd-framebuffer.patch
+- Gemini-S1 target build:
+  ./build.sh \
+    vendor/allwinnertech/boards/r528/r528s3-gemini-s1/configs/nsh_minidisplay \
+    -j4
+- Factory-layout pack interface on an ARM64 host:
+  qemu-i386-static -L <i386-runtime-root> <dragon> \
+    image.cfg sys_partition_for_dragon.fex
+
+Artifacts
+- nsh.fex: 6,216,208 bytes
+  SHA-256: 1e8318d0a0b1047172524276189692b31e2d1147a9e2f7d924056daad310a8bd
+- nuttx.elf: 56,527,264 bytes
+  SHA-256: 2670264ffe0283b396e6a14090e53058bb70c380d322ac95914d7e1028458c65
+- LiveSuit factory-layout image: 28,120,064 bytes
+  SHA-256: 354e68d1aa940cc06cfa3af58b60cbf8826079b1456fe9e37c002977537a69fd
+
+Offline image inspection
+- IMAGEWTY header version: 0x300
+- Embedded files: 22
+- MBR partitions: 10
+- bootloader: 16,384 sectors
+- res: 51,200 sectors
+- usrdata: 441,856 sectors
+- The standalone nsh.fex is byte-identical to the image's embedded nsh.fex.
+- The embedded nsh.fex is byte-identical to the unpacked bootloader partition.
+- Compared with the previously flashed and verified factory-layout image, only
+  nsh.fex, Vnsh.fex, and the derived bootloader partition differ.
+
+Verification boundary
+- This record proves source tests, target compilation, link, packaging, hashes,
+  and offline image consistency.
+- Portrait orientation, touch-coordinate mapping, project QR readability, and
+  runtime stability remain DEVICE_FLASH_PENDING until verified on Gemini-S1.
