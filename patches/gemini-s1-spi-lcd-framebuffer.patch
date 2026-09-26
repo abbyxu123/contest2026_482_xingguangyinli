@@ -1,0 +1,80 @@
+diff --git a/chips/r528/drivers/rtos-hal/hal/source/disp2/Make.defs b/chips/r528/drivers/rtos-hal/hal/source/disp2/Make.defs
+--- a/chips/r528/drivers/rtos-hal/hal/source/disp2/Make.defs
++++ b/chips/r528/drivers/rtos-hal/hal/source/disp2/Make.defs
+@@ -124,6 +124,8 @@ endif
+ 
+ ifeq ($(CONFIG_VIDEO_FB),y)
++ifneq ($(CONFIG_LCD_ILI9341_HARDWARE_SPI),y)
+ CHIP_CSRCS += $(DISP_PATH)/disp/dev_fb.c
+ endif
++endif
+ 
+ endif
+diff --git a/chips/r528/drivers/rtos-hal/hal/source/disp2/CMakeLists.txt b/chips/r528/drivers/rtos-hal/hal/source/disp2/CMakeLists.txt
+--- a/chips/r528/drivers/rtos-hal/hal/source/disp2/CMakeLists.txt
++++ b/chips/r528/drivers/rtos-hal/hal/source/disp2/CMakeLists.txt
+@@ -27,7 +27,7 @@ if(CONFIG_DISP2_SUNXI)
+ 		list(APPEND SRCS disp/lcd/tft08006.c)
+ 	endif()
+ 
+-	if(CONFIG_VIDEO_FB)
++	if(CONFIG_VIDEO_FB AND NOT CONFIG_LCD_ILI9341_HARDWARE_SPI)
+         list(APPEND SRCS disp/dev_fb.c)
+     endif()
+ 	
+diff --git a/chips/r528/drivers/rtos-hal/hal/source/disp2/soc/ili9341_lcd_spi.c b/chips/r528/drivers/rtos-hal/hal/source/disp2/soc/ili9341_lcd_spi.c
+--- a/chips/r528/drivers/rtos-hal/hal/source/disp2/soc/ili9341_lcd_spi.c
++++ b/chips/r528/drivers/rtos-hal/hal/source/disp2/soc/ili9341_lcd_spi.c
+@@ -31,6 +31,7 @@
+ #include <inttypes.h>
+ #include <stdbool.h>
+ #include <sys/types.h>
++#include <stdlib.h>
+ 
+ #include <nuttx/arch.h>
+ #include <nuttx/irq.h>
+@@ -633,7 +634,7 @@ int board_lcd_initialize(void)
+     if (g_lcddev == NULL)
+     {
+         lcdinfo("Initialize ili9341 lcd driver NULL\n");
+-        return ENODEV;
++        return -ENODEV;
+     }
+     lcd_delay_ms(100);
+     hal_gpio_sel_vol_mode(LCD_BACKLIGHT_PIN, POWER_MODE_330);
+@@ -662,3 +663,23 @@ struct lcd_dev_s *board_lcd_getdev(int lcddev)
+ }
+ 
++/****************************************************************************
++ * Name: board_lcd_uninitialize
++ ****************************************************************************/
++
++void board_lcd_uninitialize(void)
++{
++    if (g_lcddev != NULL)
++    {
++        if (g_lcddev->setpower != NULL)
++        {
++            g_lcddev->setpower(g_lcddev, 0);
++        }
++
++        g_lcddev = NULL;
++    }
++
++    free(g_ili9341_lcd_buffer);
++    g_ili9341_lcd_buffer = NULL;
++}
++
+ #endif /* CONFIG_LCD_ILI9341 */
+\ No newline at end of file
+diff --git a/boards/r528/r528s3-gemini-s1/configs/nsh_minidisplay/defconfig b/boards/r528/r528s3-gemini-s1/configs/nsh_minidisplay/defconfig
+--- a/boards/r528/r528s3-gemini-s1/configs/nsh_minidisplay/defconfig
++++ b/boards/r528/r528s3-gemini-s1/configs/nsh_minidisplay/defconfig
+@@ -312,6 +312,6 @@ CONFIG_KVDB=y
+ CONFIG_LCD=y
+ CONFIG_LCD_DEV=y
+-CONFIG_LCD_EXTERNINIT=y
++# CONFIG_LCD_EXTERNINIT is not set
+ CONFIG_LCD_FRAMEBUFFER=y
+ CONFIG_LCD_ILI9341=y
+ CONFIG_LCD_ILI9341_IFACE0=y

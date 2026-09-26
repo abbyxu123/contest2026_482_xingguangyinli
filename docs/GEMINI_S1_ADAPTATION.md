@@ -19,24 +19,29 @@ Gemini-S1（Allwinner R528S3）是 Living Canvas 的正式目标主控，目标�
 | 设备基线 | USB/ADB 身份和板载麦克风非内容信号已验证 | `tests/evidence/device/` |
 | 恢复通道 | FEL 身份、R528/T113 芯片 ID、Winbond 256 MiB SPI NAND 已识别 | `tests/evidence/device/gemini-s1-fel-spinand-20260920.txt` |
 | 写入前保护 | 完整 SPI NAND 只读备份已生成并校验 | `tests/evidence/device/gemini-s1-fel-spinand-20260920.txt` |
-| macOS 部署复核 | Apple Silicon macOS 上完成镜像校验、结构检查、FEL 稳定性和 NAND 只读通路复核；FES DRAM 初始化已通过，U-Boot/FES 重枚举仍待完成 | `tests/evidence/device/gemini-s1-macos-retest-20260925.txt`、`tests/evidence/device/gemini-s1-fes-uboot-progress-20260925.txt` |
+| macOS 部署复核 | Apple Silicon macOS 上已完成镜像检查、FEL、完整 NAND 写入、逐阶段校验、自动重启与 openvela 启动 | `tests/evidence/device/gemini-s1-macos-retest-20260925.txt`、`tests/evidence/device/gemini-s1-full-flash-runtime-20260926.txt` |
 | 完整 NAND 烧录 | 128 MiB 整包完成全擦写、分阶段校验、Boot0/Boot1 写入与自动重启 | `tests/evidence/device/gemini-s1-full-flash-runtime-20260926.txt` |
 | openvela 真机启动 | 烧录后从 NAND 启动并进入 UART2 NSH；目标符号 `living_canvas_main` 已链接 | `tests/evidence/device/gemini-s1-full-flash-runtime-20260926.txt` |
-| LVGL 与输入设备 | `/dev/fb0`、`/dev/input0` 打开成功，标准 LVGL 任务稳定运行，帧缓冲确认存在新像素 | `tests/evidence/device/gemini-s1-full-flash-runtime-20260926.txt` |
-| 实体屏交接 | 已收敛至 ILI9341 CPU/TCON 传输和 240x320→320x240 旋转配置，继续适配 | `tests/evidence/device/gemini-s1-full-flash-runtime-20260926.txt` |
+| LVGL 与输入设备 | SPI LCD framebuffer 报告 RGB565 320×240；`/dev/fb0` 与 `/dev/input0` 打开成功，官方 widgets 与触摸事件均在实体屏验证 | `tests/evidence/device/gemini-s1-spi-display-runtime-20260927.txt` |
+| Living Canvas 实体屏 | 作品画面、决策覆盖层与二维码组件已在 Gemini-S1 实体屏显示并循环；最终竖屏与触摸坐标继续校准 | `tests/evidence/device/gemini-s1-spi-display-runtime-20260927.txt` |
 
-## 2026-09-26 真机推进
+## 2026-09-27 SPI 屏与作品真机验证
 
-Gemini-S1 已完成完整 NAND 烧录与校验，并在自动重启后从 NAND 进入
-openvela NSH。LVGL 成功打开 320x240、32 位的 `/dev/fb0`，触摸驱动成功
-打开 `/dev/input0`；标准 LVGL 任务在修正可选旋转空指针后保持运行，且
-帧缓冲内可读取到由 LVGL 写入的新像素。
+Gemini-S1 已完成第二轮完整 NAND 烧录与逐阶段校验，并在自动重启后从 NAND
+进入 openvela NSH。链接映射确认 `/dev/fb0` 已由 NuttX `lcd_framebuffer`
+提供，板级初始化由 `ili9341_lcd_spi` 提供，不再由未连接到 SPI 面板的 DISP2
+framebuffer 提供。
 
-实体屏当前仍显示面板初始化图案。显示管理器报告物理时序为 240x320，
-应用表面为 320x240；内置显示引擎彩条测试也没有改变面板画面。剩余工作
-因此已收敛到 ILI9341 CPU/TCON 帧传输和横屏旋转交接，而不是镜像写入、
-openvela 启动、应用链接或 LVGL/触摸设备初始化。完整脱敏记录见
-`tests/evidence/device/gemini-s1-full-flash-runtime-20260926.txt`。
+新运行时报告 RGB565、320×240、16 bpp、153,600 字节 framebuffer 和 640
+字节 stride。官方 LVGL widgets 已在实体屏显示；触摸日期控件后，日期选择器
+在实体屏弹出，完成从输入事件到画面刷新的端到端验证。随后在干净重启后启动
+Living Canvas 比赛循环，作品背景、决策覆盖层和二维码组件均已在 Gemini-S1
+实体屏显示。
+
+当前验证配置仍是 320×240 横屏，最终画框需要 240×320 竖屏与触摸坐标校准；
+工程验证二维码也不是最终公开手机交接页。两项均保留为独立产品校准门禁，不影响
+本次 SPI 显示、触摸与作品真机运行结论。完整脱敏记录见
+`tests/evidence/device/gemini-s1-spi-display-runtime-20260927.txt`。
 
 ## 历史适配边界（2026-09-25）
 
@@ -68,12 +73,12 @@ openvela 启动、应用链接或 LVGL/触摸设备初始化。完整脱敏记�
 - 按 ai_agent 官方 Markdown 格式编写、目标部署到
   `/data/agent/skills/dinner-assistant.md` 的 Dinner Assistant Skill。
 
-板端验收只有在以下门禁全部通过后才会标记完成：
+板端验收继续按以下门禁逐项完成：
 
-1. 核对板卡版本、烧录专用 U-Boot/FES 组合、恢复工具和可回滚镜像；
-2. 在可恢复条件下完成受控写入并校验分区；
-3. 通过串口或等价通道确认 openvela 启动；
-4. 分别验证 LVGL 显示、触摸、音频、网络和 ai_agent；
+1. 核对板卡版本、烧录专用 U-Boot/FES 组合、恢复工具和可回滚镜像（已完成）；
+2. 在可恢复条件下完成受控写入并校验分区（已完成）；
+3. 通过串口确认 openvela 启动（已完成）；
+4. 分别验证 LVGL 显示与触摸（已完成），继续验证音频播放、网络和 ai_agent；
 5. 完成从存在事件到确认、执行和手机交接的实体板端演示；
 6. 将脱敏结果补入 `tests/evidence/`。
 
