@@ -1,6 +1,6 @@
 # Gemini-S1 / openvela 适配状态
 
-最后核验：2026-09-26（Asia/Shanghai）
+最后核验：2026-09-27（Asia/Shanghai）
 
 ## 平台定位
 
@@ -24,6 +24,23 @@ Gemini-S1（Allwinner R528S3）是 Living Canvas 的正式目标主控，目标�
 | openvela 真机启动 | 烧录后从 NAND 启动并进入 UART2 NSH；目标符号 `living_canvas_main` 已链接 | `tests/evidence/device/gemini-s1-full-flash-runtime-20260926.txt` |
 | LVGL 与输入设备 | SPI LCD framebuffer 报告 RGB565 320×240；`/dev/fb0` 与 `/dev/input0` 打开成功，官方 widgets 与触摸事件均在实体屏验证 | `tests/evidence/device/gemini-s1-spi-display-runtime-20260927.txt` |
 | Living Canvas 实体屏 | 作品画面、决策覆盖层与二维码组件已在 Gemini-S1 实体屏显示并循环；最终竖屏与触摸坐标继续校准 | `tests/evidence/device/gemini-s1-spi-display-runtime-20260927.txt` |
+| 240×320 竖屏候选 | ARM64 全量构建、整包封装和离线一致性检查通过；真机刷入待验证 | `tests/evidence/build/gemini-s1-portrait-project-demo-20260927.txt` |
+
+## 2026-09-27 240×320 竖屏候选构建
+
+为匹配实体画框中纵向安装的 4.5 cm × 5.7 cm 可视区域，Gemini-S1 的
+ILI9341 配置已切换为 240×320 portrait 候选。应用同时新增公开项目链接模式，
+二维码指向本队公开赛事仓，界面明确标为项目资料，不再把工程验证链接描述为订单
+或付款交接。
+
+该候选在 Ubuntu 22.04 ARM64 主机完成 12 项严格 C 测试、openvela 全量编译、
+链接、factory-layout 整包封装和离线解包检查。板级后处理脚本也改为使用构建系统
+选择的 `strip` 与 `objcopy`，消除对 `linux-x86_64` 工具目录的硬编码。新整包与
+上一版已验证镜像相比，只有 `nsh.fex`、对应副本和派生的 bootloader 分区发生
+变化。
+
+本节只记为 `BUILD_PACK_INSPECT_PASS`。竖屏方向、触摸映射、二维码可读性和循环
+稳定性仍须在刷入 Gemini-S1 后验证，完成前不记为板端运行通过。
 
 ## 2026-09-27 SPI 屏与作品真机验证
 

@@ -67,6 +67,17 @@ diff --git a/chips/r528/drivers/rtos-hal/hal/source/disp2/soc/ili9341_lcd_spi.c 
 +
  #endif /* CONFIG_LCD_ILI9341 */
 \ No newline at end of file
+diff --git a/boards/r528/r528s3-gemini-s1/scripts/Make.defs b/boards/r528/r528s3-gemini-s1/scripts/Make.defs
+--- a/boards/r528/r528s3-gemini-s1/scripts/Make.defs
++++ b/boards/r528/r528s3-gemini-s1/scripts/Make.defs
+@@ -124,5 +124,5 @@ define POSTBUILD
+     cp nuttx nuttx.elf
+     $(Q)echo "Generating: nuttx.bin";
+-    $(TOPDIR)/../prebuilts/gcc/linux-x86_64/arm-none-eabi/bin/arm-none-eabi-strip --remove-section=.note.gnu.build-id nuttx
+-    $(TOPDIR)/../prebuilts/gcc/linux-x86_64/arm-none-eabi/bin/arm-none-eabi-objcopy -v -O binary nuttx vela.bin
++    $(CROSSDEV)strip --remove-section=.note.gnu.build-id nuttx
++    $(OBJCOPY) -v -O binary nuttx vela.bin
+     $(Q)echo "Firmware is being converted: vela.bin";
 diff --git a/boards/r528/r528s3-gemini-s1/configs/nsh_minidisplay/defconfig b/boards/r528/r528s3-gemini-s1/configs/nsh_minidisplay/defconfig
 --- a/boards/r528/r528s3-gemini-s1/configs/nsh_minidisplay/defconfig
 +++ b/boards/r528/r528s3-gemini-s1/configs/nsh_minidisplay/defconfig
@@ -78,3 +89,4 @@ diff --git a/boards/r528/r528s3-gemini-s1/configs/nsh_minidisplay/defconfig b/bo
  CONFIG_LCD_FRAMEBUFFER=y
  CONFIG_LCD_ILI9341=y
  CONFIG_LCD_ILI9341_IFACE0=y
++CONFIG_LCD_ILI9341_IFACE0_PORTRAIT=y

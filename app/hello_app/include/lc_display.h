@@ -5,5 +5,6 @@ int lc_display_run_preview(void);
 int lc_display_run_image_preview(void);
 int lc_display_run_choice_preview(void);
 int lc_display_run_competition_demo(const char *qr_url);
+int lc_display_run_project_demo(const char *project_url);
 
 #endif

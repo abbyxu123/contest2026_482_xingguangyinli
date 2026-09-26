@@ -55,6 +55,23 @@ def verify_patch(path: Path) -> None:
         "return -ENODEV;",
         "negative board initialization failure status",
     )
+    require(
+        patch,
+        "+CONFIG_LCD_ILI9341_IFACE0_PORTRAIT=y",
+        "240x320 portrait orientation for the Living Canvas artwork",
+    )
+    require(
+        patch,
+        "$(CROSSDEV)strip --remove-section=.note.gnu.build-id nuttx",
+        "host-selected ARM strip tool in the Gemini-S1 post-build step",
+    )
+    require(
+        patch,
+        "$(OBJCOPY) -v -O binary nuttx vela.bin",
+        "host-selected ARM objcopy tool in the Gemini-S1 post-build step",
+    )
+    if "+    $(TOPDIR)/../prebuilts/gcc/linux-x86_64" in patch:
+        raise AssertionError("patch must not add a host-specific x86_64 tool path")
 
 
 def main() -> int:

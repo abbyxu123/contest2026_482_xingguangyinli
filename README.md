@@ -8,7 +8,7 @@
 
 当前比赛 P0 只承诺一条可验收链路：画面中的比格犬协调“帮我点外卖”，美短猫读取口味记忆，用户在画框上二次确认后，用手机继续核对并付款。推荐、约束复核、确认与手机交接均由本仓库内独立的 Living Canvas Decision Backend 提供。鸽子、小猪和外星人分别保留给天气/提醒、食材/轻营养、探索/盲盒视角；它们是同一个主 Agent 的前台角色，不是五套各自持有权限的 Agent。
 
-> 状态更新：2026-09-27。Gemini-S1/openvela 应用、状态机、ai_agent 安全桥接、自定义 Skill、LVGL 界面和独立决策后端已经形成可重复测试的工程版本；12 个严格 C 主机测试与 34 个后端自动化测试通过。完整 NAND 镜像已在 Gemini-S1 真机完成全擦写、逐阶段校验和自动重启，openvela 已从 NAND 启动到 NSH。SPI LCD framebuffer、官方 LVGL widgets、触摸事件和 Living Canvas 作品界面均已在实体板验证；最终竖屏与触摸坐标继续校准。详见 `docs/GEMINI_S1_ADAPTATION.md`。
+> 状态更新：2026-09-27。Gemini-S1/openvela 应用、状态机、ai_agent 安全桥接、自定义 Skill、LVGL 界面和独立决策后端已经形成可重复测试的工程版本；12 个严格 C 主机测试与 34 个后端自动化测试通过。完整 NAND 镜像已在 Gemini-S1 真机完成全擦写、逐阶段校验和自动重启，openvela 已从 NAND 启动到 NSH。SPI LCD framebuffer、官方 LVGL widgets、触摸事件和 Living Canvas 作品界面均已在实体板验证。240×320 竖屏公开项目二维码候选固件已完成 ARM64 构建、整包封装和离线一致性检查，真机方向与触摸坐标仍待刷入后验证。详见 `docs/GEMINI_S1_ADAPTATION.md`。
 
 ## 一、作品简介
 
@@ -128,7 +128,7 @@ PYTHONPATH=backend/src python -m uvicorn living_canvas_backend.app:app \
 - `docs/SKILL_DEMO.md`
 - `docs/RECOVERY.md`
 
-当前状态为 `FULL_FLASH_VERIFIED / OPENVELA_BOOT_VERIFIED / SPI_DISPLAY_VERIFIED / LIVING_CANVAS_ON_PANEL_VERIFIED`。最新真机验证已完成完整 NAND 写入与校验并从 NAND 启动；SPI LCD framebuffer、LVGL、触摸事件和作品循环界面已验证。后续继续完成 240×320 竖屏与触摸坐标校准，并按音频、网络和 ai_agent 门禁逐项验证。
+当前状态为 `FULL_FLASH_VERIFIED / OPENVELA_BOOT_VERIFIED / SPI_DISPLAY_VERIFIED / LIVING_CANVAS_ON_PANEL_VERIFIED`。最新真机验证已完成完整 NAND 写入与校验并从 NAND 启动；SPI LCD framebuffer、LVGL、触摸事件和作品循环界面已验证。240×320 竖屏候选已通过构建、整包封装和离线一致性检查，但尚未计作真机竖屏通过；后续在刷入后校准触摸坐标，并按音频、网络和 ai_agent 门禁逐项验证。
 
 ### 5. 辅助交互原型（非 openvela 运行证据）
 
@@ -160,6 +160,7 @@ AI 协作目前用于需求拆解、风险边界、官方资料核对、测试�
 | 当前产品源码目标构建 | 已通过（12 项主机门禁、目标链接和整包校验） | `tests/evidence/build/gemini-s1-product-20260918.txt` |
 | Gemini-S1 NAND 整包 | 已生成、离线校验，并于 2026-09-26 完成真机全量烧录与逐阶段校验 | `tests/evidence/device/gemini-s1-full-flash-runtime-20260926.txt` |
 | Gemini-S1 LVGL / Living Canvas 实体屏 | SPI LCD framebuffer、官方 widgets、触摸事件与作品循环界面均已验证；最终竖屏继续校准 | `tests/evidence/device/gemini-s1-spi-display-runtime-20260927.txt` |
+| Gemini-S1 240×320 竖屏候选 | ARM64 全量构建、整包封装与离线一致性检查通过；真机刷入待验证 | `tests/evidence/build/gemini-s1-portrait-project-demo-20260927.txt` |
 | 千问 qwen3.8-max 最小连通 | 已验证（Mac、非敏感固定探针） | `tests/evidence/integration/qwen3.8-max-connectivity-20260915.txt` |
 | 小米 MiMo v2.5 最小连通 | 已验证（Mac、非敏感固定探针） | `tests/evidence/integration/mimo-v2.5-connectivity-20260915.txt` |
 | Gemini-S1 板载麦克风采集通路 | 已验证（仅非内容信号） | `tests/evidence/device/gemini-microphone-signal-20260914.txt` |
