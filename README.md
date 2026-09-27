@@ -160,7 +160,7 @@ AI 协作目前用于需求拆解、风险边界、官方资料核对、测试�
 | 当前产品源码目标构建 | 已通过（12 项主机门禁、目标链接和整包校验） | `tests/evidence/build/gemini-s1-product-20260918.txt` |
 | Gemini-S1 NAND 整包 | 已生成、离线校验，并于 2026-09-26 完成真机全量烧录与逐阶段校验 | `tests/evidence/device/gemini-s1-full-flash-runtime-20260926.txt` |
 | Gemini-S1 LVGL / Living Canvas 实体屏 | SPI LCD framebuffer、官方 widgets、触摸事件与作品循环界面均已验证；最终竖屏继续校准 | `tests/evidence/device/gemini-s1-spi-display-runtime-20260927.txt` |
-| Gemini-S1 240×320 竖屏候选 | ARM64 全量构建、整包封装与离线一致性检查通过；真机刷入待验证 | `tests/evidence/build/gemini-s1-portrait-project-demo-20260927.txt` |
+| Gemini-S1 240×320 竖屏候选 | ARM64 全量构建、默认网络配置脱敏重封装与离线一致性检查通过；真机刷入待验证 | `tests/evidence/build/gemini-s1-portrait-project-demo-20260927.txt` |
 | 千问 qwen3.8-max 最小连通 | 已验证（Mac、非敏感固定探针） | `tests/evidence/integration/qwen3.8-max-connectivity-20260915.txt` |
 | 小米 MiMo v2.5 最小连通 | 已验证（Mac、非敏感固定探针） | `tests/evidence/integration/mimo-v2.5-connectivity-20260915.txt` |
 | Gemini-S1 板载麦克风采集通路 | 已验证（仅非内容信号） | `tests/evidence/device/gemini-microphone-signal-20260914.txt` |
