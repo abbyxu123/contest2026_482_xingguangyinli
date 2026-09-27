@@ -1,6 +1,6 @@
 Living Canvas / Gemini-S1 portrait project-demo candidate
 Date: 2026-09-27 (Asia/Shanghai)
-Status: BUILD_PACK_INSPECT_PASS / DEVICE_FLASH_PENDING
+Status: SANITIZED_BUILD_PACK_INSPECT_PASS / DEVICE_FLASH_PENDING
 
 Target
 - Board: Gemini-S1 (Allwinner R528S3)
@@ -9,6 +9,8 @@ Target
   living_canvas --project-demo https://github.com/open-vela/contest2026_482_xingguangyinli
 - Display candidate: ILI9341 hardware SPI, RGB565, 240x320 portrait
 - Vendor base used for patch validation: a502daad
+- usrdata source: <vendor-root>/lichee/board/common/data/UDISK
+  Source manifest: 13 files, 2 directories
 
 Host and build result
 - Build host: Ubuntu 22.04, ARM64
@@ -36,14 +38,25 @@ Reproduction gates
 - Factory-layout pack interface on an ARM64 host:
   qemu-i386-static -L <i386-runtime-root> <dragon> \
     image.cfg sys_partition_for_dragon.fex
+- Sanitized YAFFS usrdata build:
+  scripts/device/build_sanitized_usrdata.sh \
+    <vendor-root>/lichee/board/common/data/UDISK <new-usrdata.fex> \
+    /usr/bin/qemu-x86_64-static \
+    -L <x86_64-runtime-root> <mkyaffs2image>
+- YAFFS manifest verification:
+  python3 scripts/device/verify_yaffs2image_manifest.py \
+    <vendor-root>/lichee/board/common/data/UDISK <new-usrdata.fex> \
+    --exclude etc/wifi/wapi.conf
 
 Artifacts
 - nsh.fex: 6,216,208 bytes
   SHA-256: 1e8318d0a0b1047172524276189692b31e2d1147a9e2f7d924056daad310a8bd
 - nuttx.elf: 56,527,264 bytes
   SHA-256: 2670264ffe0283b396e6a14090e53058bb70c380d322ac95914d7e1028458c65
-- LiveSuit factory-layout image: 28,120,064 bytes
-  SHA-256: 354e68d1aa940cc06cfa3af58b60cbf8826079b1456fe9e37c002977537a69fd
+- sanitized usrdata.fex: 11,053,056 bytes
+  SHA-256: 144dd858688af51e8ac511e2c8160dbbec4c1090f7c851912cb6cd8440b94e10
+- LiveSuit factory-layout image: 28,113,920 bytes
+  SHA-256: a0a941a61c545946b31ff620d840e656415e495d990e8eb7b5c4164877191667
 
 Offline image inspection
 - IMAGEWTY header version: 0x300
@@ -54,8 +67,20 @@ Offline image inspection
 - usrdata: 441,856 sectors
 - The standalone nsh.fex is byte-identical to the image's embedded nsh.fex.
 - The embedded nsh.fex is byte-identical to the unpacked bootloader partition.
+- The standalone sanitized usrdata.fex is byte-identical to the image's
+  embedded usrdata.fex and the unpacked usrdata partition.
+- The original board-data manifest contains 13 files and 2 directories. The
+  sanitized YAFFS image contains the expected 12 files and 2 directories after
+  the single documented exclusion; relative paths, object types, and file
+  sizes and content SHA-256 values match the source.
+- The vendor demonstration network profile is excluded from usrdata. Binary
+  scans of usrdata returned zero matches for the complete profile and its file
+  name. The profile contents are not reproduced here.
 - Compared with the previously flashed and verified factory-layout image, only
-  nsh.fex, Vnsh.fex, and the derived bootloader partition differ.
+  the application and sanitized usrdata payloads, their verification records,
+  and the corresponding derived partitions differ.
+- Compared with the immediately preceding portrait candidate, only
+  usrdata.fex, Vusrdata.fex, and the unpacked usrdata partition differ.
 
 Verification boundary
 - This record proves source tests, target compilation, link, packaging, hashes,
