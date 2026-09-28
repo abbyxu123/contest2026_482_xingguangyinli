@@ -81,6 +81,15 @@ static void create_preview(void)
 }
 
 static lv_obj_t *g_choice_cards[LC_CHOICE_COUNT];
+static const lc_choice_id_t g_choice_ids[LC_CHOICE_COUNT] =
+{
+  LC_CHOICE_TAKEOUT,
+  LC_CHOICE_MYSTERY,
+  LC_CHOICE_HOME
+};
+static lc_choice_state_t g_choice;
+static lv_obj_t *g_choice_status;
+static bool g_choice_interactive;
 static bool g_pulse_bright;
 static lc_competition_t g_competition;
 static lv_obj_t *g_competition_panel;
@@ -96,6 +105,8 @@ static char g_competition_handoff[LC_COMPETITION_QR_URL_MAX];
 static char g_competition_detail_text[LC_COMPETITION_REASON_MAX +
                                       LC_COMPETITION_PRICE_MAX + 4u];
 static bool g_project_demo;
+
+static void choice_card_event_cb(lv_event_t *event);
 
 static void init_image_descriptor(lv_image_dsc_t *descriptor,
                                   const uint8_t *data,
@@ -153,11 +164,12 @@ static bool create_background(lv_display_t *display, lv_obj_t *screen)
   return true;
 }
 
-static void style_choice_card(lv_obj_t *card, bool selected)
+static void style_choice_card(lv_obj_t *card, bool selected, bool confirmed)
 {
   lv_obj_set_style_border_width(card, selected ? 4 : 2, 0);
   lv_obj_set_style_border_color(
-    card, lv_color_hex(selected ? 0xffd66b : 0x7d604e), 0);
+    card, lv_color_hex(confirmed ? 0x65d48a
+                                : (selected ? 0xffd66b : 0x7d604e)), 0);
   lv_obj_set_style_border_opa(card,
                               selected ? LV_OPA_COVER : LV_OPA_70, 0);
 }
@@ -165,7 +177,8 @@ static void style_choice_card(lv_obj_t *card, bool selected)
 static lv_obj_t *create_choice_card(lv_obj_t *screen,
                                     const lv_image_dsc_t *source,
                                     int32_t x_offset,
-                                    bool selected)
+                                    lc_choice_id_t choice,
+                                    bool interactive)
 {
   lv_obj_t *card = lv_obj_create(screen);
   lv_obj_t *image;
@@ -176,29 +189,118 @@ static lv_obj_t *create_choice_card(lv_obj_t *screen,
   lv_obj_set_style_bg_color(card, lv_color_hex(0xf6e1c2), 0);
   lv_obj_set_style_bg_opa(card, LV_OPA_COVER, 0);
   lv_obj_set_style_radius(card, 10, 0);
-  style_choice_card(card, selected);
+  style_choice_card(card, choice == g_choice.selected, false);
+
+  if (interactive)
+    {
+      lv_obj_add_flag(card, LV_OBJ_FLAG_CLICKABLE);
+      lv_obj_add_event_cb(card, choice_card_event_cb, LV_EVENT_CLICKED,
+                          (void *)&g_choice_ids[choice]);
+    }
 
   image = lv_image_create(card);
   lv_image_set_src(image, source);
   lv_obj_center(image);
+  lv_obj_remove_flag(image, LV_OBJ_FLAG_CLICKABLE);
   return card;
+}
+
+static const char *choice_name(lc_choice_id_t choice)
+{
+  switch (choice)
+    {
+      case LC_CHOICE_TAKEOUT:
+        return "TAKEOUT";
+      case LC_CHOICE_MYSTERY:
+        return "MYSTERY BOX";
+      case LC_CHOICE_HOME:
+        return "EAT AT HOME";
+      case LC_CHOICE_COUNT:
+        break;
+    }
+
+  return "UNKNOWN";
+}
+
+static void render_choice_state(void)
+{
+  static char status[48];
+  unsigned int index;
+
+  for (index = 0u; index < LC_CHOICE_COUNT; index++)
+    {
+      bool selected = g_choice.selected == (lc_choice_id_t)index;
+      bool confirmed = selected && g_choice.confirmed;
+
+      style_choice_card(g_choice_cards[index], selected, confirmed);
+    }
+
+  if (g_choice_status == NULL)
+    {
+      return;
+    }
+
+  if (g_choice.confirmed)
+    {
+      (void)snprintf(status, sizeof(status), "CONFIRMED: %s",
+                     choice_name(g_choice.selected));
+      lv_label_set_text(g_choice_status, status);
+      lv_obj_set_style_text_color(g_choice_status,
+                                  lv_color_hex(0x65d48a), 0);
+    }
+  else if (g_choice.armed)
+    {
+      lv_label_set_text(g_choice_status, "TAP AGAIN TO CONFIRM");
+      lv_obj_set_style_text_color(g_choice_status,
+                                  lv_color_hex(0xffd66b), 0);
+    }
+  else
+    {
+      lv_label_set_text(g_choice_status, "TAP A CHOICE");
+      lv_obj_set_style_text_color(g_choice_status,
+                                  lv_color_hex(0xffffff), 0);
+    }
+}
+
+static void choice_card_event_cb(lv_event_t *event)
+{
+  const lc_choice_id_t *choice = lv_event_get_user_data(event);
+
+  if (!g_choice_interactive || lv_event_get_code(event) != LV_EVENT_CLICKED ||
+      choice == NULL)
+    {
+      return;
+    }
+
+  if (lc_choice_tap(&g_choice, *choice) != LC_CHOICE_TAP_INVALID)
+    {
+      g_pulse_bright = true;
+      render_choice_state();
+    }
 }
 
 static void pulse_selected_card(lv_timer_t *timer)
 {
   (void)timer;
+
+  if (!g_choice_interactive || !g_choice.armed || g_choice.confirmed)
+    {
+      return;
+    }
+
   g_pulse_bright = !g_pulse_bright;
-  lv_obj_set_style_border_opa(g_choice_cards[LC_CHOICE_TAKEOUT],
+  lv_obj_set_style_border_opa(g_choice_cards[g_choice.selected],
                               g_pulse_bright ? LV_OPA_COVER : LV_OPA_70,
                               0);
 }
 
-static void create_choice_overlay(lv_obj_t *screen)
+static void create_choice_overlay(lv_obj_t *screen, bool interactive)
 {
   static lv_image_dsc_t card_images[LC_CHOICE_COUNT];
-  lc_choice_state_t choice;
 
-  lc_choice_init(&choice);
+  lc_choice_init(&g_choice);
+  g_choice_interactive = interactive;
+  g_choice_status = NULL;
   init_image_descriptor(&card_images[LC_CHOICE_TAKEOUT], lc_card_takeout,
                         LC_CARD_BYTES, LC_CARD_WIDTH, LC_CARD_HEIGHT);
   init_image_descriptor(&card_images[LC_CHOICE_MYSTERY], lc_card_mystery,
@@ -208,15 +310,31 @@ static void create_choice_overlay(lv_obj_t *screen)
 
   g_choice_cards[LC_CHOICE_TAKEOUT] =
     create_choice_card(screen, &card_images[LC_CHOICE_TAKEOUT], -76,
-                       choice.selected == LC_CHOICE_TAKEOUT);
+                       LC_CHOICE_TAKEOUT, interactive);
   g_choice_cards[LC_CHOICE_MYSTERY] =
     create_choice_card(screen, &card_images[LC_CHOICE_MYSTERY], 0,
-                       choice.selected == LC_CHOICE_MYSTERY);
+                       LC_CHOICE_MYSTERY, interactive);
   g_choice_cards[LC_CHOICE_HOME] =
     create_choice_card(screen, &card_images[LC_CHOICE_HOME], 76,
-                       choice.selected == LC_CHOICE_HOME);
+                       LC_CHOICE_HOME, interactive);
+
+  if (interactive)
+    {
+      g_choice_status = lv_label_create(screen);
+      configure_label(g_choice_status, 0xffffff);
+      lv_obj_set_style_bg_color(g_choice_status, lv_color_hex(0x24150f), 0);
+      lv_obj_set_style_bg_opa(g_choice_status, LV_OPA_70, 0);
+      lv_obj_set_style_pad_all(g_choice_status, 5, 0);
+      lv_obj_set_style_radius(g_choice_status, 8, 0);
+      lv_obj_align(g_choice_status, LV_ALIGN_TOP_MID, 0, 5);
+      render_choice_state();
+    }
+
   g_pulse_bright = true;
-  (void)lv_timer_create(pulse_selected_card, 450u, NULL);
+  if (interactive)
+    {
+      (void)lv_timer_create(pulse_selected_card, 450u, NULL);
+    }
 }
 
 static void set_competition_text(const char *title,
@@ -465,7 +583,16 @@ static int run_artwork_preview(bool with_choices)
 
   if (with_choices)
     {
-      create_choice_overlay(screen);
+      if (result.indev == NULL)
+        {
+          fprintf(stderr,
+                  "Living Canvas interactive preview requires a touch input device\n");
+          lv_nuttx_deinit(&result);
+          lv_deinit();
+          return 2;
+        }
+
+      create_choice_overlay(screen, true);
     }
 
   for (;;)
@@ -599,7 +726,7 @@ static int run_link_demo(const char *qr_url, bool project_demo)
       return 2;
     }
 
-  create_choice_overlay(screen);
+  create_choice_overlay(screen, false);
   create_competition_overlay(screen, qr_url, project_demo);
 
   for (;;)
