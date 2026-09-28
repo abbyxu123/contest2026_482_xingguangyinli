@@ -1,0 +1,75 @@
+Gemini-S1 portrait flash and Living Canvas runtime validation record
+Date: 2026-09-29 (Asia/Shanghai)
+Target: Gemini-S1 / Allwinner R528S3 / openvela / ILI9341 SPI LCD
+Result: PORTRAIT_FULL_FLASH_VERIFIED / OPENVELA_BOOT_VERIFIED / PORTRAIT_UI_VERIFIED
+
+Purpose
+-------
+This record captures a sanitized, reproducible device-side validation of the
+240 x 320 Living Canvas portrait candidate. It contains no credentials,
+network configuration, model tokens, private host paths, raw UART output, or
+user content.
+
+Validated artifact
+------------------
+- Complete IMAGEWTY NAND image size: 28,113,920 bytes.
+- Complete image SHA-256:
+  a0a941a61c545946b31ff620d840e656415e495d990e8eb7b5c4164877191667
+- openvela application image (nsh.fex) SHA-256:
+  1e8318d0a0b1047172524276189692b31e2d1147a9e2f7d924056daad310a8bd
+- Linked ELF SHA-256:
+  2670264ffe0283b396e6a14090e53058bb70c380d322ac95914d7e1028458c65
+- Sanitized usrdata image SHA-256:
+  144dd858688af51e8ac511e2c8160dbbec4c1090f7c851912cb6cd8440b94e10
+
+FEL and deployment verification
+-------------------------------
+1. Boot0 accepted the documented UART recovery trigger before U-Boot.
+2. The USB recovery identity reported:
+   AWUSBFEX ID=0x00185900 (R528/T113).
+3. A preflight USB scan found exactly one FEL device.
+4. The image was written with full erase, per-stage verification, and
+   automatic reboot.
+5. DRAM initialization completed on the first status check.
+6. MBR, bootloader, resource, usrdata, Boot1, and Boot0 all verified.
+7. The programmer reported 26,116,624 partition bytes written and ended with
+   "All partitions flashed successfully".
+
+Post-flash openvela verification
+--------------------------------
+- The board automatically rebooted and re-enumerated as the expected NuttX
+  ADB target.
+- Runtime version:
+  NuttX 0.0.0 dd92bcf4257 Sep 26 2026 19:36:00 arm nsh
+- NAND worker, ADB daemon, media daemon, and NSH tasks were present.
+- /dev/fb0 existed and was accessible after the NAND boot.
+- `living_canvas` was present in the NuttX built-in application list.
+
+Portrait display acceptance
+---------------------------
+- `living_canvas --image-preview` visibly rendered the approved Living Canvas
+  artwork on the physical Gemini-S1 panel.
+- `living_canvas --choice-preview` visibly rendered the same artwork with the
+  takeout bag, mystery box, and eat-at-home rice-bowl cards.
+- Physical inspection confirmed an upright 240 x 320 portrait presentation,
+  correct aspect ratio, full visible-area coverage, and no landscape rotation.
+- The takeout card's selected border and pulse were visible on the panel.
+- The display task remained active during the observation window.
+
+Verification boundary
+---------------------
+- This record proves the exact portrait image was written to Gemini-S1 NAND,
+  verified, booted as openvela, and rendered the Living Canvas portrait UI on
+  the physical SPI panel.
+- Portrait touch-coordinate mapping and public project-QR readability remain
+  separate gates. They are not claimed by this record.
+- Audio, network, ai_agent runtime, sensors, and multi-device interaction are
+  also outside this record and remain independently testable gates.
+
+Privacy and evidence handling
+-----------------------------
+- Raw UART output is not committed because it may contain unrelated network
+  initialization data.
+- The engineering room photo is not committed; the acceptance observations
+  above retain only the device facts needed for review.
+- No ESP32 result is used as Gemini-S1/openvela runtime evidence.

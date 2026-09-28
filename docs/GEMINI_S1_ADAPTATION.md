@@ -1,6 +1,6 @@
 # Gemini-S1 / openvela 适配状态
 
-最后核验：2026-09-27（Asia/Shanghai）
+最后核验：2026-09-29（Asia/Shanghai）
 
 ## 平台定位
 
@@ -23,8 +23,30 @@ Gemini-S1（Allwinner R528S3）是 Living Canvas 的正式目标主控，目标�
 | 完整 NAND 烧录 | 128 MiB 整包完成全擦写、分阶段校验、Boot0/Boot1 写入与自动重启 | `tests/evidence/device/gemini-s1-full-flash-runtime-20260926.txt` |
 | openvela 真机启动 | 烧录后从 NAND 启动并进入 UART2 NSH；目标符号 `living_canvas_main` 已链接 | `tests/evidence/device/gemini-s1-full-flash-runtime-20260926.txt` |
 | LVGL 与输入设备 | SPI LCD framebuffer 报告 RGB565 320×240；`/dev/fb0` 与 `/dev/input0` 打开成功，官方 widgets 与触摸事件均在实体屏验证 | `tests/evidence/device/gemini-s1-spi-display-runtime-20260927.txt` |
-| Living Canvas 实体屏 | 作品画面、决策覆盖层与二维码组件已在 Gemini-S1 实体屏显示并循环；最终竖屏与触摸坐标继续校准 | `tests/evidence/device/gemini-s1-spi-display-runtime-20260927.txt` |
-| 240×320 竖屏候选 | ARM64 全量构建、默认网络配置脱敏重封装和离线一致性检查通过；真机刷入待验证 | `tests/evidence/build/gemini-s1-portrait-project-demo-20260927.txt` |
+| Living Canvas 实体屏 | 横屏作品循环和触摸事件已验证；竖屏背景、三个选择卡与默认高亮已在 Gemini-S1 实体屏验证 | `tests/evidence/device/gemini-s1-spi-display-runtime-20260927.txt`、`tests/evidence/device/gemini-s1-portrait-runtime-20260929.txt` |
+| 240×320 竖屏运行 | 脱敏整包完成 FEL 全擦写、逐阶段校验、自动重启和 NAND 启动；实体屏正向、等比例、完整显示 | `tests/evidence/device/gemini-s1-portrait-runtime-20260929.txt` |
+
+## 2026-09-29 240×320 竖屏真机验证
+
+SHA-256 为
+`a0a941a61c545946b31ff620d840e656415e495d990e8eb7b5c4164877191667`
+的脱敏 factory-layout 整包已通过 UART2 Boot0 恢复触发进入 FEL。USB 端识别
+为 `0x00185900 (R528/T113)`，写入前扫描只发现一块目标设备。
+
+刷写采用 full erase、逐阶段 verify 和自动重启。DRAM 初始化、MBR、bootloader、
+resource、usrdata、Boot1 与 Boot0 均完成校验，工具最终报告全部分区刷写成功。
+重启后目标重新上线为 NuttX ADB 设备，`/dev/fb0` 与内置应用
+`living_canvas` 均可用。
+
+`living_canvas --image-preview` 在实体屏显示画间背景；
+`living_canvas --choice-preview` 进一步显示外卖袋、盲盒和米饭三个选择卡以及默认
+高亮。实物观察确认画面为 240×320 竖屏正向、比例正确并覆盖完整可视区域。
+
+本次结论记为
+`PORTRAIT_FULL_FLASH_VERIFIED / OPENVELA_BOOT_VERIFIED / PORTRAIT_UI_VERIFIED`。
+竖屏触摸坐标和公开项目二维码可读性继续作为独立门禁，不由本次记录代替。完整
+脱敏记录见
+`tests/evidence/device/gemini-s1-portrait-runtime-20260929.txt`。
 
 ## 2026-09-27 240×320 竖屏候选构建
 
@@ -47,8 +69,9 @@ ILI9341 配置已切换为 240×320 portrait 候选。应用同时新增公开�
 `usrdata` 脱敏变化。重建的 `usrdata` 中未检出完整配置或其文件名；仓库不保存
 配置内容。
 
-本节只记为 `SANITIZED_BUILD_PACK_INSPECT_PASS`。竖屏方向、触摸映射、二维码
-可读性和循环稳定性仍须在刷入 Gemini-S1 后验证，完成前不记为板端运行通过。
+本节的构建阶段记为 `SANITIZED_BUILD_PACK_INSPECT_PASS`。同一 SHA-256 整包已于
+2026-09-29 完成真机写入、NAND 启动和竖屏 UI 验证；对应运行证据见上一节。
+竖屏触摸映射和公开项目二维码可读性仍保持为独立门禁。
 
 ## 2026-09-27 SPI 屏与作品真机验证
 

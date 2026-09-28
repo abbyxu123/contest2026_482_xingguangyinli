@@ -1,6 +1,6 @@
 Living Canvas / Gemini-S1 portrait project-demo candidate
 Date: 2026-09-27 (Asia/Shanghai)
-Status: SANITIZED_BUILD_PACK_INSPECT_PASS / DEVICE_FLASH_PENDING
+Status: SANITIZED_BUILD_PACK_INSPECT_PASS / DEVICE_RUNTIME_VERIFIED_SEPARATELY
 
 Target
 - Board: Gemini-S1 (Allwinner R528S3)
@@ -85,5 +85,8 @@ Offline image inspection
 Verification boundary
 - This record proves source tests, target compilation, link, packaging, hashes,
   and offline image consistency.
-- Portrait orientation, touch-coordinate mapping, project QR readability, and
-  runtime stability remain DEVICE_FLASH_PENDING until verified on Gemini-S1.
+- The exact image identified above was subsequently written, verified, booted,
+  and accepted on the physical Gemini-S1 portrait display. See
+  tests/evidence/device/gemini-s1-portrait-runtime-20260929.txt.
+- Touch-coordinate mapping and public project QR readability remain separate
+  runtime gates and are not claimed by this build record.
