@@ -24,6 +24,10 @@ grep -q 'lv_qrcode_update' "$app_dir/src/lc_display.c"
 grep -q 'g_competition.dish' "$app_dir/src/lc_display.c"
 grep -q 'g_competition.reason' "$app_dir/src/lc_display.c"
 grep -q 'g_competition.price' "$app_dir/src/lc_display.c"
+grep -q 'LV_EVENT_CLICKED' "$app_dir/src/lc_display.c"
+grep -q 'lc_choice_tap' "$app_dir/src/lc_display.c"
+grep -q 'interactive preview requires a touch input device' \
+  "$app_dir/src/lc_display.c"
 if grep -q 'TOMATO BEEF RICE' "$app_dir/src/lc_display.c"; then
   echo 'FAIL: competition renderer still hard-codes the recommended dish' >&2
   exit 1
