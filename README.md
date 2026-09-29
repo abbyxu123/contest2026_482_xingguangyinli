@@ -35,6 +35,7 @@
 | --- | --- |
 | openvela + ai_agent | 团队 manifest 将应用映射进 openvela；官方 VelaClaw 客户端桥接只接收有界文本结果，设备动作仍由本地规则复核 |
 | 自定义 Skill | `app/hello_app/skills/dinner-assistant.md` 按 ai_agent 官方格式定义触发、步骤、候选数量和确认边界；目标部署到 `/data/agent/skills/dinner-assistant.md` |
+| AI 开发 Skill | `skills/gemini-s1-firmware-acceptance/SKILL.md` 复用 Gemini-S1 竖屏固件的源码、构建、封包、隐私与真机验收门禁；与产品运行时 Skill 分开 |
 | 主动感知 | 存在事件触发 `IDLE → GREETING`，并用冷却逻辑避免重复打扰 |
 | 执行场景 | 只有用户明确确认后，系统才生成灯光意图、手机交接和可删除偏好记忆；模型不能直接执行付款或设备命令 |
 | 端云协同 | 设备端负责状态机、硬约束复核、确认和界面；独立后端负责候选、会话与手机交接；网络失败时走确定性回退 |
@@ -52,6 +53,7 @@ app/hello_app/
   skills/                  可部署到 ai_agent 的 Dinner Assistant Skill
   tests/host/              可在 Mac/Linux 重复运行的主机测试
 docs/                      环境、设备基线、Gemini-S1 适配、恢复与构建门禁
+skills/                    可复用的 Gemini-S1 固件验收开发 Skill
 scripts/device/            只读 USB/ADB 身份与证据脚本
 tests/evidence/            脱敏的真实环境和设备证据
 logs/                      经人工审查后提交的赛事 AI Coding 日志
