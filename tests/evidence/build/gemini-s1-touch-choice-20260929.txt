@@ -1,0 +1,44 @@
+Living Canvas / Gemini-S1 touch-choice candidate
+Date: 2026-09-29 (Asia/Shanghai)
+Status: HOST_TESTED / TARGET_BUILT / IMAGE_INSPECTED / DEVICE_TOUCH_PENDING
+
+Target
+- Board: Gemini-S1 (Allwinner R528S3)
+- openvela configuration: r528s3-gemini-s1/configs/nsh_minidisplay
+- Display: 240x320 portrait SPI panel
+- Application mode: living_canvas --choice-preview
+- Interaction: first tap selects one of three cards; second tap on the same
+  card confirms it; selecting a different card clears the confirmation.
+- No ordering, payment, or device actuation occurs in this preview mode.
+
+Source and tests
+- Source baseline: official contest branch a5124a626db3ce50810c5df031d398bcdf1fb2b1
+- Source change: lc_choice state machine and LVGL card click handling
+- make -C app/hello_app/tests/host test: 12 C tests passed
+- bash app/hello_app/tests/host/test_lc_ui_build.sh: passed
+- Target build: ./build.sh vendor/allwinnertech/boards/r528/
+  r528s3-gemini-s1/configs/nsh_minidisplay/ -e -Wno-error -j2
+- Target build exit status: 0; living_canvas_main present in linked ELF
+
+Candidate artifacts
+- nuttx.elf: 56,537,328 bytes
+  SHA-256: 7b3e37dc9ca5c4a03a8f12d413fc9fb2a8372576742dc90990e45e65ec7ffd78
+- nsh.fex: 6,220,304 bytes
+  SHA-256: 8a8aa7bd6f5095946446cb28a1e67ddae6d36ec0cff32e2601ccce4f545ddebb
+- sanitized usrdata.fex: 11,053,056 bytes
+  SHA-256: 144dd858688af51e8ac511e2c8160dbbec4c1090f7c851912cb6cd8440b94e10
+- Factory-layout image: 28,118,016 bytes
+  SHA-256: cae7f4e436c5b9cabaa1b5f50c36051f838e366614f2c5122b9ceaae6e6db7ec
+
+Offline inspection
+- IMAGEWTY header version: 0x300
+- Embedded files: 22; MBR partitions: 10
+- nsh.fex, res.fex and sanitized usrdata.fex are present in the image.
+- Partition layout matches the previously booted portrait image.
+- The image was packaged with image.cfg and sys_partition_for_dragon.fex.
+
+Verification boundary
+- Host tests, target compilation, packaging and image structure are verified.
+- This record does not claim physical touch response, coordinate mapping,
+  Agent execution, network operation or end-to-end meal recommendation.
+- Board write and touch acceptance must be recorded separately after testing.
