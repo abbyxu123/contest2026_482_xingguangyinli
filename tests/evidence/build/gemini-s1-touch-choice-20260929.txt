@@ -13,6 +13,18 @@ Target
 
 Source and tests
 - Source baseline: official contest branch a5124a626db3ce50810c5df031d398bcdf1fb2b1
+- Application build snapshot: local source commit 8570504 (the same application
+  content was replayed in contest PR source commit e435179).
+- Build snapshot SHA-256, lc_display.c: 034c3d2b27966efad5b5a53355b8339a6faea4d96a3f73880c7bef12146cf815
+- Build snapshot SHA-256, lc_choice.c: 2b0a675f624052a07a410f49f7fe84ee5d24691f4edb67b4fccd0bcb85742777
+- Build snapshot SHA-256, lc_choice.h: ff749d1c52277a961dbc57ca33eb29d48a9a54a98a3d59b726ae29a62bbfc1f9
+- Pinned repo manifest (`repo manifest -r`) SHA-256:
+  d31be3229b192b946fba87a58a6221eabbb15d402bbf610606b9ef23f5f9cdae
+- NuttX source HEAD: dd92bcf425738734d1b8aed09c2bd4dbe3f2e438
+- Allwinner vendor source HEAD: a502daad7aeb35def2aabc668b6af1e7200efcfc
+- Allwinner vendor tracked worktree diff SHA-256:
+  8dbf5a13ccdda0d1901b83f673a0afbfab0d1dff1f6f8ed53a7ef0582e76e4ee
+  (portrait defconfig, build definitions, and SPI LCD framebuffer driver).
 - Source change: lc_choice state machine and LVGL card click handling
 - make -C app/hello_app/tests/host test: 12 C tests passed
 - bash app/hello_app/tests/host/test_lc_ui_build.sh: passed
