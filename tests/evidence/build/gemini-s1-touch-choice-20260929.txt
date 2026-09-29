@@ -34,6 +34,10 @@ Offline inspection
 - IMAGEWTY header version: 0x300
 - Embedded files: 22; MBR partitions: 10
 - nsh.fex, res.fex and sanitized usrdata.fex are present in the image.
+- The embedded nsh.fex is byte-identical to the standalone nsh.fex and the
+  unpacked bootloader partition (cmp exit status 0 for both comparisons).
+- The embedded usrdata.fex is byte-identical to the previously verified
+  sanitized candidate and the unpacked usrdata partition (cmp exit status 0).
 - Partition layout matches the previously booted portrait image.
 - The image was packaged with image.cfg and sys_partition_for_dragon.fex.
 
