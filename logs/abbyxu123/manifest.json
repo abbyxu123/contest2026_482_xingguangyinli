@@ -1,0 +1,24 @@
+{
+  "schema_version": "1.0",
+  "team_id": "contest2026_482_xingguangyinli",
+  "github_login": "abbyxu123",
+  "generator": "backfill-codex@codex",
+  "sessions": [
+    {
+      "session_id": "01a0f217-a3cf-7171-8244-7885555f22f0",
+      "tool": "codex",
+      "started_at": "2026-09-30T11:34:06.782Z",
+      "last_event_at": "2026-09-30T11:37:38.852Z",
+      "event_count": 6,
+      "file_path": "logs/abbyxu123/2026-09-30/codex__01a0f217-a3cf-7171-8244-7885555f22f0.jsonl",
+      "collection_mode": "backfill-sqlite",
+      "health": "ok",
+      "source_integrity": {
+        "main_sha256": "bea0a5afa0a0ecf9033193f9ef46fc7e8bdcf1baf499d9f509103a0576e85395",
+        "main_size": 345914,
+        "captured_at": "2026-09-30T11:47:25.571062+00:00"
+      }
+    }
+  ],
+  "updated_at": "2026-09-30T11:47:25.572325+00:00"
+}

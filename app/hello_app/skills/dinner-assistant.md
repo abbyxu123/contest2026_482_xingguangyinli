@@ -26,20 +26,40 @@ meal that fits stated constraints.
    saved only after the user explicitly confirms both the choice and the wish
    to remember it.
 6. Never order food, initiate payment, run shell commands, change hardware,
-   write credentials, or create a long-term memory entry. Those actions remain
-   behind the Living Canvas application confirmation boundary.
+   write credentials, or create a long-term memory entry from Skill output.
+   Persistent memory and physical actions require explicit application confirmation.
 
-## Response format
+**Runtime output contract**
 
-- Start with one short recommendation sentence.
-- List zero to three candidates with one factual reason each.
-- End with either one missing-information question or a request for explicit
-  user confirmation.
-- Do not include a QR target unless the Living Canvas application supplied a
-  verified target.
+Return one JSON object with reply, candidates, candidate_count, next_state, and actions.
+This output format maps to lc_dinner_result_t in `include/lc_dinner.h` and the
+rules in lc_dinner_validate_result in `src/lc_dinner.c`; that validator checks
+C structs and does not implement JSON parsing. The application must map names
+to C enums/action bits and validate before use.
+
+- next_state allowlist: LISTENING, RECOMMENDATION, ERROR.
+- actions allowlist: SHOW_STATE, SHOW_QR; encode actions as an array of names.
+- candidate_count must equal the candidates array length (0–3).
+- With candidates, next_state must be RECOMMENDATION.
+- Without candidates, next_state must be LISTENING or ERROR; omit SHOW_QR.
+  Use LISTENING for missing facts and ERROR when no safe candidate remains.
+- Each candidate has name, reason, qr_target, price_cents, allergen_flags, spicy, and requires_cooking.
+  The first three are strings, the next two unsigned integers, and the last two
+  booleans. Copy factual values only from the application-supplied catalog;
+  if required facts are missing, ask for them without inventing a candidate.
+- String limits in UTF-8 bytes are reply: 159, name: 47, reason: 95, qr_target: 127
+  (leaving room for the C terminator); do not emit embedded NUL characters.
+- Keep reply short: a recommendation or explanation, then one question or
+  explicit confirmation request. Give each candidate one factual reason.
+- Only use a verified QR target supplied by the application; otherwise use an empty qr_target and omit SHOW_QR.
+- Reject SET_LIGHT, SAVE_CONFIRMED_MEMORY, and unknown actions.
+- Reject shell/device control, credentials, and payment requests in runtime output.
+  Report rejection in reply with no candidates, ERROR, and only SHOW_STATE.
 
 ## Example
 
-User: “今晚不想做饭，预算 50 元，不吃辣。”
+User: “Help me choose dinner.” (Budget is missing.)
 
-Assistant: “可以先从不辣、无需烹饪且总价不超过 50 元的候选里选。当前目录中可核对的候选是鸡肉饭；实际价格、配料和配送时间仍需在手机端确认。是否选择它并继续到确认页？”
+```json
+{"reply":"What is your budget for dinner?","candidates":[],"candidate_count":0,"next_state":"LISTENING","actions":["SHOW_STATE"]}
+```
